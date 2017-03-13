@@ -10,7 +10,7 @@ class Hero():
 	"""
 	All informations and stuff about the hero.
 	"""
-	def __init__(self, name, ID, race, gender, age):
+	def __init__(self, ID, name, race, gender, age):
 		self.id = ID
 		## Social caracteristics
 		self.name = name
@@ -22,6 +22,7 @@ class Hero():
 		self.health = 100
 		self.mana = 50
 		self.experience = 0
+		self.level = 1
 		
 		self.armor = 0
 		self.dResistances = {"fire": 0, "lightning": 0, "cold": 0}
@@ -35,6 +36,6 @@ class Hero():
 		self.vitality = 1
 		
 		## Stuff
-		dStuff = {"head": None, "ears": None, "chest": None, "hands": None, "legs": None, "feet": None, "leftHand": None, "rightHand": None}
-	
-	
+		self.dStuff = {"head": None, "ears": None, "chest": None, "hands": None, "legs": None, "feet": None, "leftHand": None, "rightHand": None}
+		self.bag = []
+
