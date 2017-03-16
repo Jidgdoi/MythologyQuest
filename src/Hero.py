@@ -10,13 +10,15 @@ class Hero():
 	"""
 	All informations and stuff about the hero.
 	"""
-	def __init__(self, ID, name, race, gender, age):
-		self.id = ID
+	def __init__(self, **kwargs):
+		## --- Set default Hero attributes
+		self.id = 'h0'
 		## Social caracteristics
-		self.name = name
-		self.race = race
-		self.gender = gender
-		self.age = age
+		self.name = "Unknown"
+		self.race = "Human"
+		self.grade = "Squire"
+		self.gender = "Male"
+		self.age = 20
 		
 		## Stats
 		self.health = 100
@@ -38,4 +40,12 @@ class Hero():
 		## Stuff
 		self.dStuff = {"head": None, "ears": None, "chest": None, "hands": None, "legs": None, "feet": None, "leftHand": None, "rightHand": None}
 		self.bag = []
-
+		
+		## --- Set users attributes
+		for k,v in kwargs.items():
+			if hasattr(self, k): setattr(self, k, v)
+			else: print "\033[1;31mError\033[0m: the attribute {} doesn\'t exist.".format(k)
+	
+	def __repr__(self):
+		txt = "[ %s ] %s %s level %d." %(self.name, self.race, self.grade, self.level)
+		return txt

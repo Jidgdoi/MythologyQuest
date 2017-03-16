@@ -11,30 +11,34 @@ class Item():
 	An item.
 	"""
 	def __init__(self, **kwargs):
-		self.name = kwargs['name']
-		self.description = kwargs['description']
-		self.type = kwargs['type'] # Weapon, consumable, armor, crafting ...
-		if self.type == "consumable":
-			self.stack = kwargs['stack']
-			self.action = kwargs['action']
-		elif self.type == "weapon":
-			self.damage = kwargs['damage']
-		elif self.type == "cloth":
-			self.armor = kwargs['armor']
-			self.resistance = kwargs['resistance']
+		## --- Set default Item attributes
+		self.id = 'i0'
+		self.name = "Item"
+		self.description = "Unset object."
+		self.type = "Unset" # Weapon, consumable, armor, crafting ...
+		self.stack = None
+		self.action = {}
+		self.damage = None
+		self.armor = None
+		self.resistance = {}
+		
+		## --- Set users attributes
+		for k,v in kwargs.items():
+			if hasattr(self, k): setattr(self, k, v)
+			else: print "\033[1;31mError\033[0m: the attribute {} doesn\'t exist.".format(k)
 	
 	def __repr__(self):
 		"""
 		Representation of the object.
 		"""
-		txt = "%s: %s\n" %(self.name, self.description)
+		txt = "[ %s ] %s\n" %(self.name, self.description)
 		if self.type == "consumable":
-			txt += "   Stack: %d" %(self.stack)
+			txt += " |_ Stack: %s" %(self.stack)
 		elif self.type == "weapon":
-			txt += "   Damage: %d-%d" %(self.damage)
+			txt += " |_ Damage: %s-%s" %(self.damage)
 		elif self.type == "cloth":
-			txt += "   Armor: %d\n" %(self.armor)
-			txt += "   Resistance: {}".format(self.resistance)
+			txt += " |  Armor: %s\n" %(self.armor)
+			txt += " |_ Resistance: {}".format(self.resistance)
 		return txt
 
 ## Consumable

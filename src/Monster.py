@@ -8,12 +8,13 @@ class Monster():
 	"""
 	Object representing a monster.
 	"""
-	def __init__(self):
-		self.id = ID
+	def __init__(self, **kwargs):
+		## --- Set default Monster attributes
+		self.id = 'm0'
 		## Social caracteristics
-		self.name = name
-		self.race = race # Human, Undead, Beast, ...
-		self.gender = gender
+		self.name = "Gobelin"
+		self.type = "Beast" # Human, Undead, Beast, ...
+		self.gender = "Male"
 		
 		## Stats
 		self.health = 100
@@ -28,3 +29,12 @@ class Monster():
 		
 		# Loot
 		self.loots = {'item': 0.05}
+		
+		## --- Set users attributes
+		for k,v in kwargs.items():
+			if hasattr(self, k): setattr(self, k, v)
+			else: print "\033[1;31mError\033[0m: the attribute {} doesn\'t exist.".format(k)
+	
+	def __repr__(self):
+		txt = "[ %s ] %s level %d." %(self.name, self.type, self.level)
+		return txt

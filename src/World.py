@@ -20,4 +20,3 @@ class World():
 		Return a nested list full of unset Cell.
 		"""
 		return [[Cell(x , y, 'grass') for y in range(w)] for x in range(h)]
-		

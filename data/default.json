@@ -1,0 +1,92 @@
+{
+    "Hero": {
+        "h1":
+        {
+            "id": "h1",
+            "name": "Maximus",
+            "race": "Human",
+            "grade": "Warrior",
+            "gender": "Male",
+            "age": 27,
+            "health": 110,
+            "mana": 0,
+            "baseDamage": 5,
+            "strength": 15,
+            "agility": 8,
+            "intelligence": 7,
+            "vitality": 14,
+            "items": {"head": null, "leftHand": "Sword"}
+        },
+        "h2":
+        {
+            "id": "h2",
+            "name": "Legolas",
+            "race": "Human",
+            "grade": "Rogue",
+            "gender": "Male",
+            "age": 22,
+            "health": 90,
+            "mana": 0,
+            "baseDamage": 5,
+            "strength": 11,
+            "agility": 15,
+            "intelligence": 10,
+            "vitality": 9,
+            "items": {"head": null, "leftHand": "Bow"}
+        },
+        "h3":
+        {
+            "id": "h3",
+            "name": "Dumbledor",
+            "race": "Human",
+            "grade": "Mage",
+            "gender": "Male",
+            "age": 54,
+            "health": 80,
+            "mana": 100,
+            "baseDamage": 2,
+            "strength": 7,
+            "agility": 5,
+            "intelligence": 23,
+            "vitality": 9,
+            "items": {"head": null, "leftHand": "Book"}
+        }
+        },
+    "Monster": {
+        "m1":
+        {
+            "id": "m1",
+            "name": "Gobelin",
+            "health": 25,
+            "type": "Beast",
+            "baseDamage": 3
+        },
+        "m2":
+        {
+            "id": "m2",
+            "name": "Mercenary",
+            "health": 50,
+            "type": "Human",
+            "baseDamage": 5
+        },
+        "m3":
+        {
+            "id": "m3",
+            "name": "Wolf",
+            "health": 35,
+            "type": "Beast",
+            "baseDamage": 7
+        }
+        },
+    "Item": {
+        "i1":
+        {
+            "id": "i1",
+            "name": "Health potion",
+            "description": "Restore 50pts of health.",
+            "type": "consumable",
+            "stack": 1,
+            "action": {"add":{"health":50}}
+        }
+        }
+}
