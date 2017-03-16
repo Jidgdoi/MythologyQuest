@@ -26,7 +26,7 @@ class Item():
 		for k,v in kwargs.items():
 			if hasattr(self, k): setattr(self, k, v)
 			else: print "\033[1;31mError\033[0m: the attribute {} doesn\'t exist.".format(k)
-	
+
 	def __repr__(self):
 		"""
 		Representation of the object.

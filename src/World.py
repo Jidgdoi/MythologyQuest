@@ -14,7 +14,7 @@ class World():
 		self.height = height
 		self.width = width
 		self.world = self.createWorld(height, width)
-	
+
 	def createWorld(self, h, w):
 		"""
 		Return a nested list full of unset Cell.
