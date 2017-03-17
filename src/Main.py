@@ -10,7 +10,7 @@ from Monster import Monster
 from Item import Item
 from Cell import Cell
 from World import World
-import jsonParser
+import JsonParser
 import threading,Queue
 
 
@@ -22,23 +22,23 @@ if __name__=='__main__':
 	
 	## Load JSON file
 	defaultDataFile = os.sep.join([rootDir, "data", "default.json"])
-	jsonData = jsonParser.loadJSON( defaultDataFile )
+	jsonData = JsonParser.loadJSON( defaultDataFile )
 	
 	## Read Heroes
 	print " HEROES ".center(25, '-')
-	dh = jsonParser.readObject(jsonData, 'Hero', Hero)
+	dh = JsonParser.readObject(jsonData, 'Hero', Hero)
 	for i in dh.values():
 		print i
 	
 	## Read Monsters
 	print " MONSTERS ".center(25, '-')
-	dm = jsonParser.readObject(jsonData, 'Monster', Monster)
+	dm = JsonParser.readObject(jsonData, 'Monster', Monster)
 	for i in dm.values():
 		print i
 	
 	## Read Items
 	print " ITEMS ".center(25, '-')
-	di = jsonParser.readObject(jsonData, 'Item', Item)
+	di = JsonParser.readObject(jsonData, 'Item', Item)
 	for i in di.values():
 		print i
 	

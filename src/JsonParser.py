@@ -26,38 +26,37 @@ def loadJSON(filename):
 	"""
 	return json.loads( open(filename,"r").read() )
 
-def readObject(jsonData, Class, Object):
+def readObject(jsonData, Class):
 	"""
 	Return all objects of type Class as a dictionary.
-	'jsonData': dictionary formated like JSON format.
+	'jsonData': dictionary formated to JSON format.
 	'Class': Class to read.
-	'Object': the object of class 'Class'.
 	"""
 	dObject = {}
-	for ID in jsonData[Class].keys():
-		obj = Object()
-		[setattr(obj, k, v) for k,v in jsonData[Class][ID].items()]
+	for ID in jsonData[Class.__name__].keys():
+		obj = Class()
+		[setattr(obj, k, v) for k,v in jsonData[Class.__name__][ID].items()]
 		dObject[ID] = obj
 	return dObject
 
-def addObject(jsonData, attr, Object):
+def addObject(jsonData, Object):
 	"""
-	Add the attributes of the object 'Object' to the attribute 'attr'.
+	Add the instance of 'Object' to the JSON.
+	'jsonData': dictionary formated to JSON format.
+	'Object': Object to add.
 	"""
-	jsonData[attr].append( vars(Object) )
-
-def updateAttribute(jsonData, attr, (key, value)):
-	"""
-	
-	"""
-	return
+	if jsonData[Object.__class__.__name__].has_key( Object.id ): print >> sys.stderr, "Error: the Object ID '%s' already exist in the JSON Data." %Object.id
+	else: jsonData[Object.__class__.__name__][Object.id] = vars(Object)
 
 def writeJson(jsonData, oFile):
 	with open(oFile, "w") as fh:
 		json.dump(jsonData, fh, indent=4)
 
+def printJson(jsonData):
+	print >> sys.stdout, json.dumps(jsonData, indent=4)
+
 # =======================
-#    ===   MAIN   ===
+#    ===   TEST   ===
 # =======================
 
 if __name__=='__main__':
@@ -68,28 +67,22 @@ if __name__=='__main__':
 		iFile = sys.argv[1]
 		oFile = sys.argv[2] if len(sys.argv) > 2 else None
 	
-	## Read JSON file
+	## Load JSON file
 	jsonData = loadJSON(iFile)
 	
-	## Read Heroes
-	print " HEROES ".center(25, '-')
-	dh = readObject(jsonData, 'Hero', Hero)
-	for i in dh.values():
-		print i
+	## Read JSON data and create objects.
+	dObj = {}
+	for Class in [Hero, Monster, Item]:
+		print " %s ".center(25, '-') %(Class.__name__)
+		dTmp = readObject(jsonData, Class)
+		dObj.update( dTmp )
+		for i in dTmp.values():
+			print i
 	
-	## Read Monsters
-	print " MONSTERS ".center(25, '-')
-	dm = readObject(jsonData, 'Monster', Monster)
-	for i in dm.values():
-		print i
-	
-	## Read Items
-	print " ITEMS ".center(25, '-')
-	di = readObject(jsonData, 'Item', Item)
-	for i in di.values():
-		print i
+	addObject(jsonData, dObj['h1'])
+	addObject(jsonData, Hero(name='Rufus'))
 	
 	# Write or print Json data
 	if oFile: writeJson(jsonData, oFile)
-#	else: print >> sys.stdout, json.dumps(jsonData, indent=4)
+	else: printJson(jsonData)
 

@@ -10,9 +10,11 @@ class Hero():
 	"""
 	All informations and stuff about the hero.
 	"""
+	nextID = 0
 	def __init__(self, **kwargs):
 		## --- Set default Hero attributes
-		self.id = 'h0'
+		## Set ID
+		self.id = self.__generateID__()
 		## Social caracteristics
 		self.name = "Unknown"
 		self.race = "Human"
@@ -49,3 +51,10 @@ class Hero():
 	def __repr__(self):
 		txt = "[ %s ] %s %s level %d." %(self.name, self.race, self.grade, self.level)
 		return txt
+
+	def __generateID__(self):
+		"""
+		Generate ID.
+		"""
+		Hero.nextID += 1
+		return "h%d"%Hero.nextID

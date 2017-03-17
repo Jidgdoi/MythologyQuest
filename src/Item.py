@@ -10,9 +10,10 @@ class Item():
 	"""
 	An item.
 	"""
+	nextID = 0
 	def __init__(self, **kwargs):
 		## --- Set default Item attributes
-		self.id = 'i0'
+		self.id = self.__generateID__()
 		self.name = "Item"
 		self.description = "Unset object."
 		self.type = "Unset" # Weapon, consumable, armor, crafting ...
@@ -40,6 +41,13 @@ class Item():
 			txt += " |  Armor: %s\n" %(self.armor)
 			txt += " |_ Resistance: {}".format(self.resistance)
 		return txt
+
+	def __generateID__(self):
+		"""
+		Generate ID.
+		"""
+		Item.nextID += 1
+		return "i%d"%Item.nextID
 
 ## Consumable
 HealthPotion = Item(name="Health potion", description="Restore 50pts of health.", type="consumable", stack=1, action={"add":{"health":50}})

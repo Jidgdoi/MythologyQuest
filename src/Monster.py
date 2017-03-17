@@ -8,9 +8,11 @@ class Monster():
 	"""
 	Object representing a monster.
 	"""
+	nextID = 0
 	def __init__(self, **kwargs):
 		## --- Set default Monster attributes
-		self.id = 'm0'
+		## Set ID
+		self.id = self.__generateID__()
 		## Social caracteristics
 		self.name = "Gobelin"
 		self.type = "Beast" # Human, Undead, Beast, ...
@@ -38,3 +40,10 @@ class Monster():
 	def __repr__(self):
 		txt = "[ %s ] %s level %d." %(self.name, self.type, self.level)
 		return txt
+
+	def __generateID__(self):
+		"""
+		Generate ID.
+		"""
+		Monster.nextID += 1
+		return "m%d"%Monster.nextID
