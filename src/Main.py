@@ -10,9 +10,9 @@ from Monster import Monster
 from Item import Item
 from Cell import Cell
 from World import World
+import Utility.Colors as Colors
 import JsonParser
 import threading,Queue
-
 
 def getRootDir():
 	return os.sep.join(os.path.realpath(sys.argv[0]).split(os.sep)[:-2])
@@ -24,50 +24,47 @@ if __name__=='__main__':
 	defaultDataFile = os.sep.join([rootDir, "data", "default.json"])
 	jsonData = JsonParser.loadJSON( defaultDataFile )
 	
-	## Read Heroes
-	print " HEROES ".center(25, '-')
-	dh = JsonParser.readObject(jsonData, 'Hero', Hero)
-	for i in dh.values():
-		print i
-	
-	## Read Monsters
-	print " MONSTERS ".center(25, '-')
-	dm = JsonParser.readObject(jsonData, 'Monster', Monster)
-	for i in dm.values():
-		print i
-	
-	## Read Items
-	print " ITEMS ".center(25, '-')
-	di = JsonParser.readObject(jsonData, 'Item', Item)
-	for i in di.values():
-		print i
+	## Read JSON data and create objects.
+	dObj = {}
+	for Class in [Hero, Monster, Item]:
+		print " {} ".format(Class.__name__.upper()).center(25, '-')
+		dTmp = JsonParser.readObject(jsonData, Class)
+		dObj.update( dTmp )
+		for i in dTmp.values():
+			print i
 	
 	## Create Cells
 	lCells = []
-	lCells.append( [Cell(0,i, "water") for i in xrange(10)] )
-	lCells.append( [Cell(1,i, "water") for i in xrange(10)] )
-	lCells.append( [Cell(2,i, "forest") for i in xrange(10)] )
-	lCells.append( [Cell(3,i, "forest") for i in xrange(10)] )
-	lCells.append( [Cell(4,i, "forest") for i in xrange(10)] )
+	lCells.append( [Cell("water") for i in xrange(10)] )
+	lCells.append( [Cell("water") for i in xrange(10)] )
+	lCells.append( [Cell("forest") for i in xrange(10)] )
+	lCells.append( [Cell("forest") for i in xrange(10)] )
+	lCells.append( [Cell("forest") for i in xrange(10)] )
 	
 	[lCells[1][i].update(surface="forest") for i in [3,4,5]]
 	[lCells[i][4].update(surface="path") for i in [2,3,4]]
 	lCells[3][4].update(hero=True)
 	
+	## Colors associated to each features.
+	dColor = {"water": Colors.color(bgColor="blue")(" "),
+			  "forest": Colors.color(bgColor="green")(" "),
+			  "path": Colors.color()(" ")}
+	
 	txt = ''
 	for line in lCells:
 		previousCellType = False
 		for cell in line:
+			print cell
 			if previousCellType:
 				# Space between 2 walls: set features wall for the space
-				if cell.surface == "path": txt += cell.design
-				elif previousCellType == "path": txt += cell.design
-				elif previousCellType == cell.surface: txt += cell.design
-				elif previousCellType != cell.surface: txt += cell.design
+				if cell.surface == "path": txt += dColor[cell.surface]
+				elif previousCellType == "path": txt += dColor[cell.surface]
+				elif previousCellType == cell.surface: txt += dColor[cell.surface]
+				elif previousCellType != cell.surface: txt += dColor[cell.surface]
 				# Just a space
 				else: txt += ' '
-			txt += cell.design
-			previousCellType = cell.surface
+			txt += dColor[cell.surface]
+			previousCellType = dColor[cell.surface]
 		txt += '\n'
 	print txt
 

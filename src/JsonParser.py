@@ -73,7 +73,7 @@ if __name__=='__main__':
 	## Read JSON data and create objects.
 	dObj = {}
 	for Class in [Hero, Monster, Item]:
-		print " %s ".center(25, '-') %(Class.__name__)
+		print " {} ".format(Class.__name__.upper()).center(25, '-')
 		dTmp = readObject(jsonData, Class)
 		dObj.update( dTmp )
 		for i in dTmp.values():
