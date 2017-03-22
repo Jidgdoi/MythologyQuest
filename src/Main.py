@@ -5,14 +5,15 @@
 # @date 13 Mar 2017
 
 import os,sys
+import threading, Queue, time
+import JsonParser
+
 from Hero import Hero
 from Monster import Monster
 from Item import Item
 from Cell import Cell
 from World import World
 import Utility.Colors as Colors
-import JsonParser
-import threading,Queue
 
 def getRootDir():
 	return os.sep.join(os.path.realpath(sys.argv[0]).split(os.sep)[:-2])
@@ -20,9 +21,16 @@ def getRootDir():
 if __name__=='__main__':
 	rootDir = getRootDir()
 	
+	## ======================================
+	## Initiate threads and the wx app
+	## ======================================
+	
+	## ======================================
 	## Load JSON file
+	## ======================================
 	defaultDataFile = os.sep.join([rootDir, "data", "default.json"])
 	jsonData = JsonParser.loadJSON( defaultDataFile )
+	
 	
 	## Read JSON data and create objects.
 	dObj = {}
@@ -33,42 +41,11 @@ if __name__=='__main__':
 		for i in dTmp.values():
 			print i
 	
-	## Create Cells
-	lCells = []
-	lCells.append( [Cell("water") for i in xrange(10)] )
-	lCells.append( [Cell("water") for i in xrange(10)] )
-	lCells.append( [Cell("forest") for i in xrange(10)] )
-	lCells.append( [Cell("forest") for i in xrange(10)] )
-	lCells.append( [Cell("forest") for i in xrange(10)] )
+	## Load map
+	mapDir = os.sep.join([rootDir, "data", "map"])
+	world = World()
+	world.loadMap("%s%sdefault.txt"%(mapDir, os.sep))
 	
-	[lCells[1][i].update(surface="forest") for i in [3,4,5]]
-	[lCells[i][4].update(surface="path") for i in [2,3,4]]
-	lCells[3][4].update(hero=True)
+	cellMap = world.cellulizeMap("Default map")
 	
-	## Colors associated to each features.
-	dColor = {"water": Colors.color(bgColor="blue")(" "),
-			  "forest": Colors.color(bgColor="green")(" "),
-			  "path": Colors.color()(" ")}
-	
-	txt = ''
-	for line in lCells:
-		previousCellType = False
-		for cell in line:
-			print cell
-			if previousCellType:
-				# Space between 2 walls: set features wall for the space
-				if cell.surface == "path": txt += dColor[cell.surface]
-				elif previousCellType == "path": txt += dColor[cell.surface]
-				elif previousCellType == cell.surface: txt += dColor[cell.surface]
-				elif previousCellType != cell.surface: txt += dColor[cell.surface]
-				# Just a space
-				else: txt += ' '
-			txt += dColor[cell.surface]
-			previousCellType = dColor[cell.surface]
-		txt += '\n'
-	print txt
-
-
-
-
-
+	print world

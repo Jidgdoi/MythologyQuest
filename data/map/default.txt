@@ -1,0 +1,11 @@
+Default map
+w;w;w;w;w;w;p;w;w;w
+w;w;w;f;f;p;p;f;w;w
+f;f;f;f;f;p;f;f;f;f
+f;f;f;p;p;p;f;f;f;f
+w;f;f;p;f;f;f;f;f;f
+w;w;f;p;f;f;f;w;w;w
+w;f;f;p;f;f;f;f;w;w
+f;f;p;p;f;f;w;w;w;w
+f;f;ph;f;f;f;w;w;f;f
+f;f;p;f;f;w;w;f;f;f

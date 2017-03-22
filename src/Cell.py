@@ -9,16 +9,12 @@ class Cell():
 	Object representing a single Cell in the entire flat world.
 	"""
 	water = 47
-	def __init__(self, surface, **kwargs):
+	def __init__(self, surface, hero=False, treasure=False, trap=False):
 		self.surface = surface
-		self.hero = False
-		self.treasure = False
-		self.trap = False
-		
-		## --- Set users attributes
-		for k,v in kwargs.items():
-			if hasattr(self, k): setattr(self, k, v)
-			else: print "\033[1;31mError\033[0m: the attribute {} doesn\'t exist.".format(k)
+		self.hero = hero
+		self.treasure = treasure
+		self.trap = trap
+		self.item = hero if hero else treasure if treasure else trap if trap else ''
 		
 		self.isWalkable = True if self.surface not in ['wall', 'water'] else False
 		self.isWaterway = True if self.surface == 'water' else False
