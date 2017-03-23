@@ -13,6 +13,7 @@ from Monster import Monster
 from Item import Item
 from Cell import Cell
 from World import World
+import Graphic
 import Utility.Colors as Colors
 
 def getRootDir():
@@ -48,4 +49,4 @@ if __name__=='__main__':
 	
 	cellMap = world.cellulizeMap("Default map")
 	
-	print world
+	print Graphic.terminalOutput( world.cellMap )
