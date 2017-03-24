@@ -29,9 +29,6 @@ class Item():
 			else: print "\033[1;31mError\033[0m: the attribute {} doesn\'t exist.".format(k)
 
 	def __repr__(self):
-		"""
-		Representation of the object.
-		"""
 		txt = "[ %s ] %s\n" %(self.name, self.description)
 		if self.type == "consumable":
 			txt += " |_ Stack: %s" %(self.stack)

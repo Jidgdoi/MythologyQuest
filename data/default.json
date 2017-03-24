@@ -88,5 +88,27 @@
             "stack": 1,
             "action": {"add":{"health":50}}
         }
+        },
+    "Spell": {
+        "s1":
+        {
+            "id": "s1",
+            "name": "Heal",
+            "description": "Restore around 20pts of health.",
+            "type": "beneficial",
+            "level": 1,
+            "cost": 12,
+            "action": {"add":{"health":["gauss", 20, 1]}}
+        },
+        "s2":
+        {
+            "id": "s2",
+            "name": "Fire bolt",
+            "description": "Inflict 7-10 pts of fire damage to one opponent.",
+            "type": "fire",
+            "level": 1,
+            "cost": 15,
+            "action": {"deal":{"fire":["gauss", 8, 0.5]}}
+        }
         }
 }

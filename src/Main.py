@@ -7,10 +7,12 @@
 import os,sys
 import threading, Queue, time
 import JsonParser
+import random as rd
 
 from Hero import Hero
 from Monster import Monster
 from Item import Item
+from Spell import Spell
 from Cell import Cell
 from World import World
 import Graphic
@@ -35,12 +37,15 @@ if __name__=='__main__':
 	
 	## Read JSON data and create objects.
 	dObj = {}
-	for Class in [Hero, Monster, Item]:
+	for Class in [Hero, Monster, Item, Spell]:
 		print " {} ".format(Class.__name__.upper()).center(25, '-')
 		dTmp = JsonParser.readObject(jsonData, Class)
 		dObj.update( dTmp )
 		for i in dTmp.values():
 			print i
+	print
+	
+	print rd.randint(dObj["s1"].action["add"]["health"][0], dObj["s1"].action["add"]["health"][1])
 	
 	## Load map
 	mapDir = os.sep.join([rootDir, "data", "map"])
