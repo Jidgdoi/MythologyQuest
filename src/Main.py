@@ -5,7 +5,7 @@
 # @date 13 Mar 2017
 
 import os,sys
-import threading, Queue, time
+import time
 import JsonParser
 import random as rd
 

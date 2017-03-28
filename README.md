@@ -1,13 +1,9 @@
 ## MythologyQuest
 RPG based on the mythology. Python program.
 
-## Todo
-Develop World and Graphic.
+## Libraries
+- Pygame version 1.9.3
+'sudo pip install pygame'
+- Json version 2.0.9
+'sudo pip install simplejson
 
-## Pygame
-
-# Install
-'sudo pip2 install pygame'
-
-# Example code and programs:
-'http://programarcadegames.com/index.php?chapter=example_code'
