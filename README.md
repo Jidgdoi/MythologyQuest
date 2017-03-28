@@ -2,8 +2,8 @@
 RPG based on the mythology. Python program.
 
 ## Libraries
-- Pygame version 1.9.3
-'sudo pip install pygame'
-- Json version 2.0.9
-'sudo pip install simplejson
+- Json version 2.0.9: 'sudo pip install simplejson'
+- Pygame version 1.9.3: 'sudo pip install pygame'
 
+## Example of Pygame code
+http://programarcadegames.com/index.php?chapter=example_code
