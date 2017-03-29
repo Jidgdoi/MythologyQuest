@@ -36,6 +36,7 @@ def readObject(jsonData, Class):
 	for ID in jsonData[Class.__name__].keys():
 		obj = Class()
 		[setattr(obj, k, v) for k,v in jsonData[Class.__name__][ID].items()]
+		if Class.__name__ == 'Hero': obj.activeSprite()
 		dObject[ID] = obj
 	return dObject
 

@@ -1,4 +1,7 @@
 Default map
+20;20
+4;3 2;7
+1;7
 w;w;w;w;w;w;p;w;w;w;w;w;w;w;w;w;p;w;w;w;w;w;w;w;w;w;p;w;w;w;w;w;w;w;w;w;p;w;w;w
 w;w;w;f;f;p;p;f;w;w;w;w;w;f;f;p;p;f;w;w;w;w;w;f;f;p;p;f;w;w;w;w;w;f;f;p;p;f;w;w
 f;f;f;f;f;p;f;f;f;f;f;f;f;f;f;p;f;f;f;f;f;f;f;f;f;p;f;f;f;f;f;f;f;f;f;p;f;f;f;f

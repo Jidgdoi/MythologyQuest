@@ -9,6 +9,7 @@ import time
 import src.JsonParser as JsonParser
 import random as rd
 import pygame
+from itertools import chain
 
 import src.Utility.Utils as Utils
 
@@ -23,16 +24,11 @@ import src.Graphic
 import src.Utility.Colors as Colors
 
 if __name__=='__main__':
-	print Utils.ROOT_DIR
-	print Utils.IMAGE_PATH
-	print Utils.JSON_PATH
-	print Utils.MAP_PATH
 	## ======================================
 	## Initialize Pygame and an 800*600 sized screen
 	## ======================================
 	pygame.init()
-	screen_size = [800, 600]
-	screen = pygame.display.set_mode(screen_size)
+	screen = pygame.display.set_mode( Utils.SCREEN_SIZE)
 	
 	# Used to manage how fast the screen updates
 	clock = pygame.time.Clock()
@@ -40,12 +36,9 @@ if __name__=='__main__':
 	# Ending flag
 	endflag = False
 	
-	n = 0
-	colorKey = sorted(pygame.color.THECOLORS.keys())
-	SPEED = 3
-	
 	# Init list of sprites
-	all_sprites_list = pygame.sprite.Group()
+	lSprites_hero = pygame.sprite.Group()
+	lSprites_cell = pygame.sprite.Group()
 	
 	## ======================================
 	## Load data
@@ -57,12 +50,12 @@ if __name__=='__main__':
 	for Class in [Hero, Monster, Item, Spell]:
 		dObj.update( JsonParser.readObject(jsonData, Class) )
 	
-	all_sprites_list.add(dObj['h1'].sprite)
+	lSprites_hero.add(dObj['h1'].sprite)
 	
 	# Map
-	world = World()
-	world.loadMap(os.sep.join([Utils.MAP_PATH, os.sep, "default.txt"]))
-	cellMap = world.cellulizeMap("Default map")
+	world = World(os.sep.join([Utils.MAP_PATH, os.sep, "default.txt"]))
+	
+	lSprites_cell.add( world.getCellSprites() )
 	
 	## ======================================
 	## Main program loop
@@ -70,48 +63,53 @@ if __name__=='__main__':
 	while not endflag:
 		# Parse all event done by the user
 		for event in pygame.event.get():
-#			print event
 			if event.type == pygame.QUIT:
 				endflag = True
-			
-			elif event.type == pygame.MOUSEMOTION:
-				n = (n+1)%len(colorKey)
-				print colorKey[n]
 			
 			# Set the speed based on the key pressed
 			elif event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
-					dObj['h1'].sprite.preUpdate(-SPEED, 0, "left")
+					dObj['h1'].sprite.preUpdate("left")
+					[cell_sprite.changePos(Utils.SPEED, 0) for cell_sprite in lSprites_cell]
 				elif event.key == pygame.K_RIGHT:
-					dObj['h1'].sprite.preUpdate(SPEED, 0, "right")
+					dObj['h1'].sprite.preUpdate("right")
+					[cell_sprite.changePos(-Utils.SPEED, 0) for cell_sprite in lSprites_cell]
 				elif event.key == pygame.K_UP:
-					dObj['h1'].sprite.preUpdate(0, -SPEED, "up")
+					dObj['h1'].sprite.preUpdate("up")
+					[cell_sprite.changePos(0, Utils.SPEED) for cell_sprite in lSprites_cell]
 				elif event.key == pygame.K_DOWN:
-					dObj['h1'].sprite.preUpdate(0, SPEED, "down")
-	 
+					dObj['h1'].sprite.preUpdate("down")
+					[cell_sprite.changePos(0, -Utils.SPEED) for cell_sprite in lSprites_cell]
+			
 			# Reset speed when key goes up
 			elif event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT:
-					dObj['h1'].sprite.preUpdate(SPEED, 0, "left")
+					dObj['h1'].sprite.preUpdate("left")
+					[cell_sprite.changePos(-Utils.SPEED, 0) for cell_sprite in lSprites_cell]
 				elif event.key == pygame.K_RIGHT:
-					dObj['h1'].sprite.preUpdate(-SPEED, 0, "right")
+					dObj['h1'].sprite.preUpdate("right")
+					[cell_sprite.changePos(Utils.SPEED, 0) for cell_sprite in lSprites_cell]
 				elif event.key == pygame.K_UP:
-					dObj['h1'].sprite.preUpdate(0, SPEED, "up")
+					dObj['h1'].sprite.preUpdate("up")
+					[cell_sprite.changePos(0, -Utils.SPEED) for cell_sprite in lSprites_cell]
 				elif event.key == pygame.K_DOWN:
-					dObj['h1'].sprite.preUpdate(0, -SPEED, "down")
+					dObj['h1'].sprite.preUpdate("down")
+					[cell_sprite.changePos(0, Utils.SPEED) for cell_sprite in lSprites_cell]
 		
 		## ==================================
 		## Draw section
 		## ==================================
 		
 		# Update sprites
-		all_sprites_list.update()
+		lSprites_hero.update()
+		lSprites_cell.update()
 		
 		# Clear screen
-		screen.fill( pygame.color.THECOLORS[colorKey[n]] )
+		screen.fill( Utils.COLORS['water'] )
 		
 		# Draw sprites
-		all_sprites_list.draw(screen)
+		lSprites_cell.draw(screen)
+		lSprites_hero.draw(screen)
 		
 		# Go ahead and update the screen with what we've drawn.
 		pygame.display.flip()

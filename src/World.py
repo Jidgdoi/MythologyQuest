@@ -7,54 +7,87 @@
 from Cell import Cell
 from collections import deque
 
+from src.Utility.Utils import SCREEN_DIM
+
 class World():
 	"""
 	Object representing the entire flat world.
 	"""
-	def __init__(self, *args):
-		## Load list of maps
-		self.dMap = {}
+	def __init__(self, filename):
+		## Attributes storing map
+		self.rawMap = []
 		self.cellMap = []
-		for filename in args:
-			self.loadMap(filename)
+		## Map dimension
+		self.width = 0
+		self.height = 0
+		## Hero position
+		self.hero_x = 0
+		self.hero_y = 0
+		## Treasure and trap coordinates
+		self.lCoordTreasure = []
+		self.lCoordTrap = []
+		
+		## Load and create map
+		self.loadMap(filename)
+		self.cellulizeMap()
 
 	def loadMap(self, filename):
 		"""
-		Load a map and store it in a dictionary as {'Map name': lMap}.
+		Load a map.
+		Update attributes: mapName, txtMap, hero_x, hero_y, lCoordTreasure, lCoordTrap, width and height
 		'filename': filename of the map.
 		"""
-		lMap = deque()
+		self.rawMap = deque()
 		fh = open(filename, 'r')
-		mapname = fh.readline().strip()
-		if self.dMap.has_key(mapname):
-			print >> sys.stderr, "[ \033[1;31mWarning\033[0m ] The map '%s' has already been loaded."
+		# First line: Map name
+		self.mapName = fh.readline().strip()
+		# Second line: Hero position
+		self.hero_x, self.hero_y = map(int, fh.readline().strip().split(';'))
+		# Third line: Treasures coordinates
+		self.lCoordTreasure = [map(int, i.split(';')) for i in fh.readline().strip().split(' ')]
+		# Fourth line: Traps coordinates
+		self.lCoordTrap = [map(int, i.split(';')) for i in fh.readline().strip().split(' ')]
+		
+		# Next lines: the map
 		line = fh.readline()
 		while line:
-			lMap.append( deque(line.strip().split(';')) )
+			self.rawMap.append( deque(line.strip().split(';')) )
 			line = fh.readline()
 		fh.close()
-		self.dMap[mapname] = lMap
+		
+		# Set attributes
+		self.width = len(self.rawMap[0])
+		self.height = len(self.rawMap)
 
-	def cellulizeMap(self, mapname):
+	def cellulizeMap(self):
 		"""
 		Cellulize a map, which means create the map with Cell objects.
+		Update attribute cellMap
 		"""
-		dCellMap = deque()
-		for x in xrange(len(self.dMap[mapname])):
-			dCellMap.append( deque() )
-			for y in xrange(len(self.dMap[mapname][x])):
-				surface, (hero,treasure,trap) = self.decodeMapCell(self.dMap[mapname][x][y])
-				dCellMap[x].append( Cell(surface, hero, treasure, trap) )
-		self.cellMap = dCellMap
+		self.cellMap = deque()
+		for i in xrange(self.height):
+			self.cellMap.append( deque() )
+			for j in xrange(self.width):
+				surface = self.decodeMapCell(self.rawMap[i][j])
+				hero     = True if (i,j) == (self.hero_x, self.hero_y) else False
+				treasure = True if (i,j) in self.lCoordTreasure else False
+				trap     = True if (i,j) in self.lCoordTrap else False
+				self.cellMap[i].append( Cell(surface, j, i, self.hero_x, self.hero_y, hero, treasure, trap) )
 
 	def decodeMapCell(self, code):
+		"""Decode a map's cell."""
+		return {'w':"water", 'f':"forest", 'p':"path", 'n':"none", 'W':"wall"}[code]
+
+	def getCellSprites(self, hero_x=None, hero_y=None):
 		"""
-		Decode a cell of a map.
+		Return all the cell.sprite attributes.
 		"""
-		args = [False, False, False]
-		for i in code:
-			if i in 'wfp': surface = {'w':"water", 'f':"forest", 'p':"path"}[i]
-			elif i == 'h': args[0] = "hero"
-			elif i == 't': args[1] = "treasure"
-			elif i == 'T': args[2] = "trap"
-		return surface, args
+		if not hero_x: hero_x = self.hero_x
+		if not hero_y: hero_y = self.hero_y
+		lSprite = []
+		for i in xrange(hero_y - SCREEN_DIM[1]/2 -1, hero_y + SCREEN_DIM[1]/2 +1):
+			for j in xrange(hero_x - SCREEN_DIM[0]/2 -1, hero_x + SCREEN_DIM[0]/2 +1):
+				if i < 0 or i >= self.height: continue
+				if j < 0 or j >= self.width: continue
+				lSprite.append( self.cellMap[i][j].sprite )
+		return lSprite
