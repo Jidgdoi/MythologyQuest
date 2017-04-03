@@ -14,6 +14,7 @@ class World():
 	Object representing the entire flat world.
 	"""
 	def __init__(self, filename):
+		self.mapName = "default"
 		## Attributes storing map
 		self.rawMap = []
 		self.cellMap = []

@@ -7,3 +7,8 @@ RPG based on the mythology. Python program.
 
 ## Example of Pygame code
 http://programarcadegames.com/index.php?chapter=example_code
+
+## TODO list
+- Map data: a map should be define in 2 files:
+ - 'name.map': the map encoded.
+ - 'name.json': items defining the map and his content.

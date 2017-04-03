@@ -45,21 +45,3 @@ class Item():
 		"""
 		Item.nextID += 1
 		return "i%d"%Item.nextID
-
-## Consumable
-HealthPotion = Item(name="Health potion", description="Restore 50pts of health.", type="consumable", stack=1, action={"add":{"health":50}})
-ManaPotion   = Item(name="Mana potion", description="Restore 50pts of mana.", type="consumable", stack=1, action={"add":{"mana":50}})
-
-## Weapon
-WoodenSword = Item(name="Wooden sword", description="Wooden sword, for children.", type="weapon", damage=(2,3))
-WoodenStick = Item(name="Wooden stick", description="Wooden stick, used to lead sheeps.", type="weapon", damage=(1,2))
-
-## Cloth
-Cap = Item(name="Cap", description="Small cap made in web.", type="cloth", armor=1, resistance={})
-Gloves = Item(name="Gloves", description="Gloves in web.", type="cloth", armor=1, resistance={})
-
-
-if __name__=='__main__':
-	print HealthPotion
-	print WoodenSword
-	print Cap
