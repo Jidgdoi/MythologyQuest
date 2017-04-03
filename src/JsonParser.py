@@ -18,6 +18,13 @@ from Item import Item
 #    ===   FUNCTIONS   ===
 # ============================
 
+def loadJSONmap(filehandler):
+	"""
+	Load the JSON part of a map file.
+	'filehandler": file object
+	"""
+	return json.loads( filehandler.read() )
+
 def loadJSON(filename):
 	"""
 	Load a JSON file.

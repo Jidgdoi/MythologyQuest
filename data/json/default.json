@@ -1,7 +1,6 @@
 {
     "Hero": {
-        "h1":
-        {
+        "h1": {
             "id": "h1",
             "name": "Maximus",
             "race": "Human",
@@ -17,8 +16,7 @@
             "vitality": 14,
             "items": {"head": null, "leftHand": "Sword"}
         },
-        "h2":
-        {
+        "h2": {
             "id": "h2",
             "name": "Legolas",
             "race": "Human",
@@ -34,8 +32,7 @@
             "vitality": 9,
             "items": {"head": null, "leftHand": "Bow"}
         },
-        "h3":
-        {
+        "h3": {
             "id": "h3",
             "name": "Dumbledor",
             "race": "Human",
@@ -51,36 +48,32 @@
             "vitality": 9,
             "items": {"head": null, "leftHand": "Book"}
         }
-        },
+    },
     "Monster": {
-        "m1":
-        {
+        "m1": {
             "id": "m1",
             "name": "Gobelin",
             "health": 25,
             "type": "Beast",
             "baseDamage": 3
         },
-        "m2":
-        {
+        "m2": {
             "id": "m2",
             "name": "Mercenary",
             "health": 50,
             "type": "Human",
             "baseDamage": 5
         },
-        "m3":
-        {
+        "m3": {
             "id": "m3",
             "name": "Wolf",
             "health": 35,
             "type": "Beast",
             "baseDamage": 7
         }
-        },
+    },
     "Item": {
-        "i1":
-        {
+        "i1": {
             "id": "i1",
             "name": "Health potion",
             "description": "Restore 50pts of health.",
@@ -88,10 +81,9 @@
             "stack": 1,
             "action": {"add":{"health":50}}
         }
-        },
+    },
     "Spell": {
-        "s1":
-        {
+        "s1": {
             "id": "s1",
             "name": "Heal",
             "description": "Restore around 20pts of health.",
@@ -100,8 +92,7 @@
             "cost": 12,
             "action": {"add":{"health":["gauss", 20, 1]}}
         },
-        "s2":
-        {
+        "s2": {
             "id": "s2",
             "name": "Fire bolt",
             "description": "Inflict 7-10 pts of fire damage to one opponent.",
@@ -110,5 +101,5 @@
             "cost": 15,
             "action": {"deal":{"fire":["gauss", 8, 0.5]}}
         }
-        }
+    }
 }

@@ -1,7 +1,3 @@
-Default map
-20;20
-4;3 2;7
-1;7
 w;w;w;w;w;w;p;w;w;w;w;w;w;w;w;w;p;w;w;w;w;w;w;w;w;w;p;w;w;w;w;w;w;w;w;w;p;w;w;w
 w;w;w;f;f;p;p;f;w;w;w;w;w;f;f;p;p;f;w;w;w;w;w;f;f;p;p;f;w;w;w;w;w;f;f;p;p;f;w;w
 f;f;f;f;f;p;f;f;f;f;f;f;f;f;f;p;f;f;f;f;f;f;f;f;f;p;f;f;f;f;f;f;f;f;f;p;f;f;f;f
@@ -42,3 +38,41 @@ w;f;f;p;f;f;f;f;w;w;w;f;f;p;f;f;f;f;w;w;w;f;f;p;f;f;f;f;w;w;w;f;f;p;f;f;f;f;w;w
 f;f;p;p;f;f;w;w;w;w;f;f;p;p;f;f;w;w;w;w;f;f;p;p;f;f;w;w;w;w;f;f;p;p;f;f;w;w;w;w
 f;f;p;f;f;f;w;w;f;f;f;f;p;f;f;f;w;w;f;f;f;f;p;f;f;f;w;w;f;f;f;f;p;f;f;f;w;w;f;f
 f;f;p;f;f;w;w;f;f;f;f;f;p;f;f;w;w;f;f;f;f;f;p;f;f;w;w;f;f;f;f;f;p;f;f;w;w;f;f;f
+
+{
+    "Map": {
+        "mapName": "Default map",
+        "hero_cell_x": 20,
+        "hero_cell_y": 20
+    },
+    "Treasure": [
+        {
+        "x": 4,
+        "y": 3,
+        "state": 1,
+        "lock": "True",
+        "loot":
+            {
+            "Gold": 100,
+            "Item": ["i1", "i1"]
+            }
+        },
+        {
+        "x": 2,
+        "y": 7,
+        "state": 1,
+        "lock": "True",
+        "loot":
+            {
+            "Gold": 140,
+            "Item": [null]
+            }
+        }
+    ],
+    "Trap": [
+        {
+        "x": 1,
+        "y": 7
+        }
+    ]
+}

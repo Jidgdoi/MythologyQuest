@@ -53,7 +53,7 @@ if __name__=='__main__':
 	lSprites_hero.add(dObj['h1'].sprite)
 	
 	# Map
-	world = World(os.sep.join([Utils.MAP_PATH, os.sep, "default.txt"]))
+	world = World(os.sep.join([Utils.MAP_PATH, "default.map"]))
 	
 	lSprites_cell.add( world.getCellSprites() )
 	
