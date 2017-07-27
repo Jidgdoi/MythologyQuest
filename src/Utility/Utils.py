@@ -20,7 +20,7 @@ CELL_DIM = np.array( [20, 20] )
 SCREEN_SIZE = np.array( [800, 600] )
 SCREEN_DIM = np.array( SCREEN_SIZE / CELL_DIM )
 
-print SCREEN_DIM
+print "Screen dimension: {}".format(SCREEN_DIM)
 
 ## World utils
 SPEED = CELL_DIM[0]/10

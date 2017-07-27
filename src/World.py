@@ -5,6 +5,7 @@
 # @date 13 Mar 2017
 
 import pygame
+import numpy as np
 
 from Cell import Cell
 from collections import deque
@@ -37,27 +38,22 @@ class World():
 		## Load and create map
 		self.loadMap(filename)
 		self.cellulizeMap()
-		
-		# Hero movement
-		self.change_x = 0
-		self.change_y = 0
 
-	def changePos(self, x, y):
-		self.change_pixel_x += x
-		self.change_pixel_y += y
+	def get_hero_pos(self):
+		return np.array([self.hero_cell_x, self.hero_cell_y])
 
-	def convertPixelToCell(self, x, y):
-		"""Return a tuple with cell positions."""
-		return (x / SCREEN_DIM[0], y / SCREEN_DIM[1])
+	def convertPixelToCell(self, (x, y)):
+		""" Return a tuple with cell positions."""
+		return np.array((x / SCREEN_DIM[0], y / SCREEN_DIM[1]))
 
-	def convertCellToPixel(self, x, y):
-		"""Return a tuple with pixel positions."""
-		return (x * SCREEN_DIM[0], y * SCREEN_DIM[1])
+	def convertCellToPixel(self, (x, y)):
+		""" Return a tuple with pixel positions."""
+		return np.array((x * SCREEN_DIM[0], y * SCREEN_DIM[1]))
 
 	def loadMap(self, filename):
 		"""
 		Load a map.
-		Update attributes: mapName, txtMap, hero_x, hero_y, lCoordTreasure, lCoordTrap, width and height
+		Update attributes: mapName, txtMap, hero_*_x, hero_*_y, lCoordTreasure, lCoordTrap, width and height
 		'filename': map filename.
 		"""
 		## Read map part of file
@@ -81,7 +77,7 @@ class World():
 			if hasattr(self, k): setattr(self, k, v)
 			else: print "\033[1;31mError\033[0m: the attribute '{}' doesn\'t exist.".format(k)
 		
-		self.hero_pixel_x, self.hero_pixel_y = self.convertCellToPixel(self.hero_cell_x, self.hero_cell_y)
+		self.hero_pixel_x, self.hero_pixel_y = self.convertCellToPixel([self.hero_cell_x, self.hero_cell_y])
 
 	def cellulizeMap(self):
 		"""
@@ -93,47 +89,39 @@ class World():
 			self.cellMap.append( deque() )
 			for j in xrange(self.width):
 				surface = self.decodeMapCell(self.rawMap[i][j])
-				hero     = True if (i,j) == (self.hero_x, self.hero_y) else False
+				hero     = True if (i,j) == (self.hero_cell_x, self.hero_cell_y) else False
 				treasure = True if (i,j) in self.lCoordTreasure else False
 				trap     = True if (i,j) in self.lCoordTrap else False
-				self.cellMap[i].append( Cell(surface, j, i, self.hero_x, self.hero_y, hero, treasure, trap) )
+				self.cellMap[i].append( Cell(surface, j, i, self.hero_cell_x, self.hero_cell_y, hero, treasure, trap) )
 
 	def decodeMapCell(self, code):
-		"""Decode a map's cell."""
+		""" Decode a map's cell."""
 		return {'w':"water", 'f':"forest", 'p':"path", 'n':"none", 'W':"wall"}[code]
 
-	def getCellSprites(self, hero_x=None, hero_y=None):
+	def getCellSprites(self, (hero_cell_x, hero_cell_y)):
+		""" Return all the cell.sprite attributes withing the range of the hero.
+		'hero_cell_x': hero cell position
+		'hero_cell_y': hero cell position
 		"""
-		Return all the cell.sprite attributes.
-		"""
-		if not hero_x: hero_x = self.hero_x
-		if not hero_y: hero_y = self.hero_y
 		lSprite = []
-		for i in xrange(hero_y - SCREEN_DIM[1]/2 -1, hero_y + SCREEN_DIM[1]/2 +1):
-			for j in xrange(hero_x - SCREEN_DIM[0]/2 -1, hero_x + SCREEN_DIM[0]/2 +1):
+		for i in xrange(hero_cell_y - SCREEN_DIM[1]/2 -1, hero_cell_y + SCREEN_DIM[1]/2 +1):
+			for j in xrange(hero_cell_x - SCREEN_DIM[0]/2 -1, hero_cell_x + SCREEN_DIM[0]/2 +1):
 				if i < 0 or i >= self.height: continue
 				if j < 0 or j >= self.width: continue
 				lSprite.append( self.cellMap[i][j].sprite )
 		return lSprite
 
-	def update(self):
-		self.hero_pixel_x += self.change_pixel_x
-		self.hero_pixel_y += self.change_pixel_y
+	def getCellBorder(self, (hero_cell_x, hero_cell_y), flank=0):
+		""" Return a list of tuples, corresponding to the position of each cells on the border of the map."""
+		xleft = hero_cell_x - SCREEN_DIM[0]/2 - flank
+		xright = hero_cell_x + SCREEN_DIM[0]/2 + flank
+		ytop = hero_cell_y - SCREEN_DIM[0]/2 - flank
+		ybot = hero_cell_y + SCREEN_DIM[0]/2 + flank
 		
-		for pos, sprite in self.dSprite.items():
-			x,y = self.convertPixelToCell(self.hero_pixel_x - (SCREEN_DIM[0]/2), self.hero_pixel_y - (SCREEN_DIM[1]/2))
-			cell_x += pos[0]
-			cell_y += pos[1]
-			
-#			if sprite:
-#				if sprite.
-			
-		
-		lSprite = []
-		for i in xrange(self.hero_y - SCREEN_DIM[1]/2 -1, self.hero_y + SCREEN_DIM[1]/2 +1):
-			for j in xrange(self.hero_x - SCREEN_DIM[0]/2 -1, self.hero_x + SCREEN_DIM[0]/2 +1):
-				if i < 0 or i >= self.height: continue
-				if j < 0 or j >= self.width: continue
-				lSprite.append( self.cellMap[i][j].sprite )
-		return lSprite
-		
+		border = zip(range(xleft, xright+1), [ytop]*(xright-xleft+1)) # top
+		border.extend( zip(range(xleft, xright+1), [ybot]*(xright-xleft+1)) ) # bot
+		border.extend( zip([xleft]*(ybot-ytop+1), range(ytop+1, ybot)) ) # left
+		border.extend( zip([xright]*(ybot-ytop+1), range(ytop+1, ybot)) ) # right
+		return border
+
+

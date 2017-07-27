@@ -57,22 +57,22 @@ class Cell_sprite(pygame.sprite.Sprite):
 		self.rect.x = (x - hero_x + SCREEN_DIM[0]/2) * self.rect.width
 		self.rect.y = (y - hero_y + SCREEN_DIM[1]/2) * self.rect.height
 		
-		# Hero position
-		self.hero_x = hero_x
-		self.hero_y = hero_y
-		
-		# Hero movement
-		self.change_x = 0
-		self.change_y = 0
+		# Cell position in the array
+		self.x = x
+		self.y = y
 
-	def changePos(self, x, y):
-		self.change_x += x
-		self.change_y += y
+	def enterTheGame(self, (hero_x, hero_y)):
+		""" The sprite is in range of the hero: set his position correctly."""
+		self.rect.x = (self.x - hero_x + SCREEN_DIM[0]/2) * self.rect.width
+		self.rect.y = (self.y - hero_y + SCREEN_DIM[1]/2) * self.rect.height
 
-	def update(self):
-		self.rect.x += self.change_x
-		self.rect.y += self.change_y
+	def update(self, (hero_x, hero_y), reset=False):
+		""" Called by the Group sprite function Update(*args), update position of the cell.
+		'hero_x': cell position of the hero
+		'hero_y': cell position of the hero
+		"""
+		self.rect.x = (self.x - hero_x + SCREEN_DIM[0]/2) * self.rect.width
+		self.rect.y = (self.y - hero_y + SCREEN_DIM[1]/2) * self.rect.height
 
-	def reset(self):
-		self.change_x = 0
-		self.change_y = 0
+
+

@@ -75,9 +75,9 @@ class Hero_sprite(pygame.sprite.Sprite):
 		self.image_left  = pygame.image.load(self.filename %"left").convert()
 		self.image_left  = pygame.transform.scale(self.image_left, CELL_DIM)
 		self.image_right = pygame.image.load(self.filename %"right").convert()
-		self.image_right  = pygame.transform.scale(self.image_right, CELL_DIM)
-		self.image_up	 = pygame.image.load(self.filename %"up").convert()
-		self.image_up  = pygame.transform.scale(self.image_up, CELL_DIM)
+		self.image_right = pygame.transform.scale(self.image_right, CELL_DIM)
+		self.image_up    = pygame.image.load(self.filename %"up").convert()
+		self.image_up    = pygame.transform.scale(self.image_up, CELL_DIM)
 		self.image_down  = pygame.image.load(self.filename %"down").convert()
 		self.image_down  = pygame.transform.scale(self.image_down, CELL_DIM)
 		self.tmp_image   = self.image_down
@@ -92,7 +92,7 @@ class Hero_sprite(pygame.sprite.Sprite):
 		self.rect.x = SCREEN_SIZE[0]/2
 		self.rect.y = SCREEN_SIZE[1]/2
 
-	def preUpdate(self, state):
+	def preUpdateImg(self, state):
 		"""Change the image profil of the character."""
 		self.tmp_image = vars(self)["image_%s" %state]
  
