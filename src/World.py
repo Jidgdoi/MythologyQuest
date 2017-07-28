@@ -8,10 +8,10 @@ import pygame
 import numpy as np
 
 from Cell import Cell
-from collections import deque
+from collections import defaultdict,deque
 import src.JsonParser as JsonParser
 
-from src.Utility.Utils import SCREEN_DIM
+from src.Utility.Utils import SCREEN_DIM,CELL_DIM,SCREEN_SIZE
 
 class World():
 	"""
@@ -20,35 +20,43 @@ class World():
 	def __init__(self, filename):
 		self.mapName = "default"
 		## Attributes storing map
-		self.rawMap = []
-		self.cellMap = []
+		self.cellMap = defaultdict(lambda: defaultdict(str))
 		self.sprites = pygame.sprite.Group()
-		## Map dimension
+		## Map cell dimension
 		self.width = 0
 		self.height = 0
 		## Hero position
-		self.hero_cell_x = 0
-		self.hero_cell_y = 0
-		self.hero_pixel_x = 0
-		self.hero_pixel_y = 0
+		self.hero_cell_xy = np.array([0,0])
+		self.hero_pixel_xy = np.array([0,0])
 		## Treasure and trap coordinates
 		self.lCoordTreasure = []
 		self.lCoordTrap = []
 		
 		## Load and create map
 		self.loadMap(filename)
-		self.cellulizeMap()
 
-	def get_hero_pos(self):
-		return np.array([self.hero_cell_x, self.hero_cell_y])
+	def get_initial_hero_pos(self):
+		return self.hero_cell_xy
 
 	def convertPixelToCell(self, (x, y)):
-		""" Return a tuple with cell positions."""
-		return np.array((x / SCREEN_DIM[0], y / SCREEN_DIM[1]))
+		""" Return a tuple with cell positions.
+		'(x, y)': Pixel position of the hero.
+		"""
+		return np.array((x / CELL_DIM[0], y / CELL_DIM[1]))
 
 	def convertCellToPixel(self, (x, y)):
-		""" Return a tuple with pixel positions."""
-		return np.array((x * SCREEN_DIM[0], y * SCREEN_DIM[1]))
+		""" Return a tuple with pixel positions.
+		'(x, y)': Cell position of the hero.
+		"""
+		return np.array((x * CELL_DIM[0], y * CELL_DIM[1]))
+
+	def screenCornerPos(self, (x, y), pixel=False):
+		""" Return the top left corner of the screen centered on the hero, means (0,0).
+		'(x, y)': Position of the hero (cell or pixel).
+		'pixel': Boolean to treat pixel instead of cell postion.
+		"""
+		if pixel: return np.array((x - SCREEN_SIZE[0]/2, y - SCREEN_SIZE[1]/2))
+		return np.array((x - SCREEN_DIM[0]/2, y - SCREEN_DIM[1]/2))
 
 	def loadMap(self, filename):
 		"""
@@ -56,12 +64,13 @@ class World():
 		Update attributes: mapName, txtMap, hero_*_x, hero_*_y, lCoordTreasure, lCoordTrap, width and height
 		'filename': map filename.
 		"""
-		## Read map part of file
-		self.rawMap = deque()
+		untreatedMap = deque()
+		## Open map file
 		fh = open(filename, 'r')
+		## Read map part of file
 		line = fh.readline()
 		while line != '\n':
-			self.rawMap.append( deque(line.strip().split(';')) )
+			untreatedMap.append( deque(line.strip().split(';')) )
 			line = fh.readline()
 		
 		## Read JSON content's part of file
@@ -69,59 +78,63 @@ class World():
 		
 		fh.close()
 		
-		# Set attributes
-		self.width = len(self.rawMap[0])
-		self.height = len(self.rawMap)
+		## Set attributes
+		self.width = len(untreatedMap[0])
+		self.height = len(untreatedMap)
 		
 		for k,v in content['Map'].items():
 			if hasattr(self, k): setattr(self, k, v)
 			else: print "\033[1;31mError\033[0m: the attribute '{}' doesn\'t exist.".format(k)
+		self.hero_cell_xy = np.array(self.hero_cell_xy)
+		self.hero_pixel_xy = self.convertCellToPixel(self.hero_cell_xy)
 		
-		self.hero_pixel_x, self.hero_pixel_y = self.convertCellToPixel([self.hero_cell_x, self.hero_cell_y])
+		## Cellulize map
+		self.cellulizeMap(untreatedMap)
 
-	def cellulizeMap(self):
+	def cellulizeMap(self, untreatedMap):
 		"""
 		Cellulize a map, which means create the map with Cell objects.
 		Update attribute cellMap.
 		"""
-		self.cellMap = deque()
-		for i in xrange(self.height):
-			self.cellMap.append( deque() )
-			for j in xrange(self.width):
-				surface = self.decodeMapCell(self.rawMap[i][j])
-				hero     = True if (i,j) == (self.hero_cell_x, self.hero_cell_y) else False
-				treasure = True if (i,j) in self.lCoordTreasure else False
-				trap     = True if (i,j) in self.lCoordTrap else False
-				self.cellMap[i].append( Cell(surface, j, i, self.hero_cell_x, self.hero_cell_y, hero, treasure, trap) )
+		for y in xrange(self.height):
+			for x in xrange(self.width):
+				surface = self.decodeMapCell(untreatedMap[y][x])
+				hero     = True if ((x,y) == self.hero_cell_xy).all() else False
+				treasure = True if (x,y) in self.lCoordTreasure else False
+				trap     = True if (x,y) in self.lCoordTrap else False
+				self.cellMap[x][y] = Cell(surface, (x, y), self.screenCornerPos(self.hero_pixel_xy, True), hero, treasure, trap)
 
 	def decodeMapCell(self, code):
 		""" Decode a map's cell."""
 		return {'w':"water", 'f':"forest", 'p':"path", 'n':"none", 'W':"wall"}[code]
 
-	def getCellSprites(self, (hero_cell_x, hero_cell_y)):
+	def getCellSprites(self, (screen_corner_x, screen_corner_y)):
 		""" Return all the cell.sprite attributes withing the range of the hero.
 		'hero_cell_x': hero cell position
 		'hero_cell_y': hero cell position
 		"""
 		lSprite = []
-		for i in xrange(hero_cell_y - SCREEN_DIM[1]/2 -1, hero_cell_y + SCREEN_DIM[1]/2 +1):
-			for j in xrange(hero_cell_x - SCREEN_DIM[0]/2 -1, hero_cell_x + SCREEN_DIM[0]/2 +1):
-				if i < 0 or i >= self.height: continue
-				if j < 0 or j >= self.width: continue
-				lSprite.append( self.cellMap[i][j].sprite )
+		for x in xrange(screen_corner_x -1, screen_corner_x + SCREEN_DIM[0] +1):
+			for y in xrange(screen_corner_y -1, screen_corner_y + SCREEN_DIM[1] +1):
+				if (x < 0 or x >= self.width) or (y < 0 or y >= self.height): continue
+				lSprite.append( self.cellMap[x][y].sprite )
 		return lSprite
 
-	def getCellBorder(self, (hero_cell_x, hero_cell_y), flank=0):
+	def getCellBorder(self, (screen_corner_x, screen_corner_y), flank=0):
 		""" Return a list of tuples, corresponding to the position of each cells on the border of the map."""
-		xleft = hero_cell_x - SCREEN_DIM[0]/2 - flank
-		xright = hero_cell_x + SCREEN_DIM[0]/2 + flank
-		ytop = hero_cell_y - SCREEN_DIM[0]/2 - flank
-		ybot = hero_cell_y + SCREEN_DIM[0]/2 + flank
+		xleft = screen_corner_x - flank
+		xright = screen_corner_x + SCREEN_DIM[0] + flank
+		ytop = screen_corner_y - flank
+		ybot = screen_corner_y + SCREEN_DIM[1] -1 + flank
 		
-		border = zip(range(xleft, xright+1), [ytop]*(xright-xleft+1)) # top
-		border.extend( zip(range(xleft, xright+1), [ybot]*(xright-xleft+1)) ) # bot
-		border.extend( zip([xleft]*(ybot-ytop+1), range(ytop+1, ybot)) ) # left
-		border.extend( zip([xright]*(ybot-ytop+1), range(ytop+1, ybot)) ) # right
+#		print "Flank: %d" %flank
+#		print " Topleft: %s\tTopright: %s" %(zip(range(xleft, xright), [ytop]*(xright-xleft))[0], zip(range(xleft, xright), [ytop]*(xright-xleft))[-1])
+#		print " Botleft: %s\tBotright: %s" %(zip(range(xleft, xright), [ybot]*(xright-xleft))[0], zip(range(xleft, xright), [ybot]*(xright-xleft))[-1])
+		
+		border = zip(range(xleft, xright), [ytop]*(xright-xleft)) # top
+		border.extend( zip(range(xleft, xright), [ybot]*(xright-xleft)) ) # bot
+		border.extend( zip([xleft]*(ybot-ytop), range(ytop, ybot)) ) # left
+		border.extend( zip([xright]*(ybot-ytop), range(ytop, ybot)) ) # right
 		return border
 
 

@@ -28,6 +28,7 @@ if __name__=='__main__':
 	## ======================================
 	## Initialize Pygame and an 800*600 sized screen
 	## ======================================
+	fpstime = 0
 	pygame.init()
 	screen = pygame.display.set_mode( Utils.SCREEN_SIZE)
 	
@@ -56,21 +57,31 @@ if __name__=='__main__':
 	# World map
 	world = World(os.sep.join([Utils.MAP_PATH, "default.map"]))
 	
+	print "World cell dimension: {}".format((world.width, world.height))
+	
 	# Hero
-	hero_cell_position = world.get_hero_pos()
+	hero_cell_position = world.get_initial_hero_pos()
 	hero_pixel_position = world.convertCellToPixel(hero_cell_position)
-	hero_moving = np.array([0, 0]) # Pixel movement
+	hero_shift = np.array([0, 0]) # Pixel movement
+	
+	# Screen
+	screen_corner = world.screenCornerPos(hero_cell_position)
 	
 	# Cell sprites
-	lSprites_cell.add( world.getCellSprites(hero_cell_position) )
+	lSprites_cell.add( world.getCellSprites(screen_corner) )
+	
+	# Text font
+	pygame.font.init()
+	myfont = pygame.font.SysFont('Comic Sans MS', 15)
 	
 	## ======================================
 	## Main program loop
 	## ======================================
 	while not endflag:
-		# Parse all event done by the user
+		## ==================================
+		## Event section
+		## ==================================
 		for event in pygame.event.get():
-			print "Hero cell position:", hero_cell_position, "\tHero pixel position:", hero_pixel_position
 			if event.type == pygame.QUIT:
 				endflag = True
 			
@@ -79,16 +90,16 @@ if __name__=='__main__':
 				## Movement
 				if event.key == pygame.K_LEFT:
 					dObj['h1'].sprite.preUpdateImg("left")
-					hero_moving += (Utils.SPEED, 0)
+					hero_shift += (-Utils.HERO_SPEED, 0)
 				elif event.key == pygame.K_RIGHT:
 					dObj['h1'].sprite.preUpdateImg("right")
-					hero_moving += (-Utils.SPEED, 0)
+					hero_shift += (Utils.HERO_SPEED, 0)
 				elif event.key == pygame.K_UP:
 					dObj['h1'].sprite.preUpdateImg("up")
-					hero_moving += (0, Utils.SPEED)
+					hero_shift += (0, -Utils.HERO_SPEED)
 				elif event.key == pygame.K_DOWN:
 					dObj['h1'].sprite.preUpdateImg("down")
-					hero_moving += (0, -Utils.SPEED)
+					hero_shift += (0, Utils.HERO_SPEED)
 				## Menu and Options
 				elif event.key == pygame.K_q:
 					endflag = True
@@ -96,67 +107,71 @@ if __name__=='__main__':
 			# Reset speed when key goes up
 			elif event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT:
-					dObj['h1'].sprite.preUpdateImg("left")
-					hero_moving += (-Utils.SPEED, 0)
+					hero_shift += (Utils.HERO_SPEED, 0)
 				elif event.key == pygame.K_RIGHT:
-					dObj['h1'].sprite.preUpdateImg("right")
-					hero_moving += (Utils.SPEED, 0)
+					hero_shift += (-Utils.HERO_SPEED, 0)
 				elif event.key == pygame.K_UP:
-					dObj['h1'].sprite.preUpdateImg("up")
-					hero_moving += (0, -Utils.SPEED)
+					hero_shift += (0, Utils.HERO_SPEED)
 				elif event.key == pygame.K_DOWN:
-					dObj['h1'].sprite.preUpdateImg("down")
-					hero_moving += (0, Utils.SPEED)
+					hero_shift += (0, -Utils.HERO_SPEED)
+		
+		## Update hero position
+		hero_pixel_position += hero_shift
+		hero_cell_position = world.convertPixelToCell(hero_pixel_position)
+		
+		screen_corner = world.screenCornerPos(hero_cell_position)
+		screen_pixel_corner = world.screenCornerPos(hero_pixel_position, True)
+		screen_pixel_shift = hero_pixel_position%Utils.CELL_DIM
+		
+		if fpstime%60 == 0:
+			print "Hero pixel:", hero_pixel_position, "\tHero cell:", hero_cell_position, "\tScreen corner:", screen_corner, "\tScreen pxl shift:", screen_pixel_shift
 		
 		## ==================================
 		## Draw section
 		## ==================================
-		# Update hero position
-		hero_pixel_position += hero_moving
-		hero_cell_position = world.convertPixelToCell(hero_pixel_position)
 		
-		# Update sprites list
-		## Only ones in border
-		### top
-		borderAdd = world.getCellBorder(hero_cell_position, 1)
-		borderRemove = world.getCellBorder(hero_cell_position, 2)
+		## Update sprites list
+		borderRemove = world.getCellBorder(screen_corner, 2)
+		borderAdd = world.getCellBorder(screen_corner, 0) + world.getCellBorder(screen_corner, 1)
 		
-		print "[1]Nb sprites:", len(lSprites_cell)
 		for sprite in lSprites_cell:
-			if (sprite.x, sprite.y) in borderRemove:
+			if sprite.xy in borderRemove:
 				lSprites_cell.remove(sprite)
-		print "[2]Nb sprites:", len(lSprites_cell)
 		
 		for (x,y) in borderAdd:
-			if x < 0 or x >= world.height: continue
-			if y < 0 or y >= world.width: continue
-			if not lSprites_cell.has( world.cellMap[y][x].sprite ):
-				lSprites_cell.add( world.cellMap[y][x].sprite )
-		print "[3]Nb sprites:", len(lSprites_cell)
+			if (x < 0 or x >= world.width) or (y < 0 or y >= world.height): continue
+			if not lSprites_cell.has( world.cellMap[x][y].sprite ):
+				world.cellMap[x][y].sprite.enterTheGame( screen_pixel_corner )
+				lSprites_cell.add( world.cellMap[x][y].sprite )
 		
 		lSprites_hero.update()
-		lSprites_cell.update(hero_pixel_position)
+		lSprites_cell.update(hero_shift)
 		
-		# Clear screen
+		## Clear screen
 		screen.fill( Utils.COLORS['water'] )
 		
-		# Draw sprites
+		## Draw sprites
 		lSprites_cell.draw(screen)
 		lSprites_hero.draw(screen)
 		
-		# Go ahead and update the screen with what we've drawn.
+		## Draw rows and columns number
+		for i in xrange(screen_corner[1], screen_corner[1] + Utils.SCREEN_DIM[1]):
+			for j in xrange(screen_corner[0], screen_corner[0] + Utils.SCREEN_DIM[0]):
+				text = myfont.render("%d/%d" %(j,i), True, (0, 0, 0))
+				screen.blit(text, world.convertCellToPixel( (j,i) - screen_corner ))
+		
+		## Go ahead and update the screen with what we've drawn.
 		pygame.display.flip()
 		
-		# Limit to 60 frames per second
-		clock.tick(60)
+		## Limit to X frames per second (default 60)
+		clock.tick(Utils.FPS)
+		
+		fpstime = (fpstime+1)%60
 	
 	# End while
 	pygame.quit()
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+

@@ -14,16 +14,17 @@ JSON_PATH = os.sep.join([ROOT_DIR, "data", "json"])
 MAP_PATH = os.sep.join([ROOT_DIR, "data", "map"])
 
 ## Cell utils
-CELL_DIM = np.array( [20, 20] )
+CELL_DIM = np.array( [50, 50] )
 
 ## Screen utils
 SCREEN_SIZE = np.array( [800, 600] )
 SCREEN_DIM = np.array( SCREEN_SIZE / CELL_DIM )
 
-print "Screen dimension: {}".format(SCREEN_DIM)
+print "Screen cell dimension: {}".format(SCREEN_DIM)
 
 ## World utils
-SPEED = CELL_DIM[0]/10
+HERO_SPEED = CELL_DIM[0]/10
+FPS = 60 # Frames per second
 
 ## Colors
 COLORS = {'forest': (33, 198, 75),

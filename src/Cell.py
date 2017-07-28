@@ -12,7 +12,7 @@ class Cell():
 	Object representing a single Cell in the entire flat world.
 	"""
 	water = 47
-	def __init__(self, surface, x, y, hero_x, hero_y, hero=False, treasure=False, trap=False):
+	def __init__(self, surface, xy, hero_xy, hero=False, treasure=False, trap=False):
 		self.surface = surface
 		self.hero = hero
 		self.treasure = treasure
@@ -22,7 +22,7 @@ class Cell():
 		self.isWalkable = True if self.surface not in ['wall', 'water'] else False
 		self.isWaterway = True if self.surface == 'water' else False
 		
-		self.sprite = Cell_sprite(self.surface, x, y, hero_x, hero_y)
+		self.sprite = Cell_sprite(self.surface, xy, hero_xy)
 
 	def __repr__(self):
 		txt = "[ %s ]" %self.surface
@@ -44,9 +44,12 @@ class Cell_sprite(pygame.sprite.Sprite):
 	This class represents a Cell in graphic mode.
 	It derives from the "Sprite" class in Pygame.
 	"""
-	def __init__(self, surface, x, y, hero_x, hero_y):
+	def __init__(self, surface, xy, hero_xy):
 		# Call the parent class (Sprite) constructor
 		super(Cell_sprite, self).__init__() 
+		
+		# Cell position in the array
+		self.xy = xy
 		
 		# Set height, width
 		self.image = pygame.Surface(CELL_DIM)
@@ -54,25 +57,19 @@ class Cell_sprite(pygame.sprite.Sprite):
 		
 		# Make our top-left corner the passed-in location.
 		self.rect = self.image.get_rect()
-		self.rect.x = (x - hero_x + SCREEN_DIM[0]/2) * self.rect.width
-		self.rect.y = (y - hero_y + SCREEN_DIM[1]/2) * self.rect.height
-		
-		# Cell position in the array
-		self.x = x
-		self.y = y
+		self.rect.x,self.rect.y = self.xy*CELL_DIM - hero_xy
 
-	def enterTheGame(self, (hero_x, hero_y)):
-		""" The sprite is in range of the hero: set his position correctly."""
-		self.rect.x = (self.x - hero_x + SCREEN_DIM[0]/2) * self.rect.width
-		self.rect.y = (self.y - hero_y + SCREEN_DIM[1]/2) * self.rect.height
+	def enterTheGame(self, screen_pixel_corner_xy):
+		""" The sprite is in range of the hero: set his position on the screen.
+		'screen_pixel_corner_xy': tuple of screen pixel corner position"""
+		self.rect.x,self.rect.y = self.xy*CELL_DIM - screen_pixel_corner_xy
 
-	def update(self, (hero_x, hero_y), reset=False):
+	def update(self, (hero_shift_x, hero_shift_y)):
 		""" Called by the Group sprite function Update(*args), update position of the cell.
-		'hero_x': cell position of the hero
-		'hero_y': cell position of the hero
+		'(hero_shift_x, hero_shift_y)': tuple of pixel shift on x and y axis
 		"""
-		self.rect.x = (self.x - hero_x + SCREEN_DIM[0]/2) * self.rect.width
-		self.rect.y = (self.y - hero_y + SCREEN_DIM[1]/2) * self.rect.height
+		self.rect.x -= hero_shift_x
+		self.rect.y -= hero_shift_y
 
 
 

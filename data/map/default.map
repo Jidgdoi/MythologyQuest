@@ -42,8 +42,7 @@ f;f;p;f;f;w;w;f;f;f;f;f;p;f;f;w;w;f;f;f;f;f;p;f;f;w;w;f;f;f;f;f;p;f;f;w;w;f;f;f
 {
     "Map": {
         "mapName": "Default map",
-        "hero_cell_x": 20,
-        "hero_cell_y": 20
+        "hero_cell_xy": [20, 20]
     },
     "Treasure": [
         {
