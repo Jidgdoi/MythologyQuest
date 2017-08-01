@@ -9,6 +9,5 @@ RPG based on the mythology. Python program.
 http://programarcadegames.com/index.php?chapter=example_code
 
 ## TODO list
-- Map data: a map should be define in 2 files:
- - 'name.map': the map encoded.
- - 'name.json': items defining the map and his content.
+ - borderless map: when reach a border, teleport to the other side.
+ - sprite collide

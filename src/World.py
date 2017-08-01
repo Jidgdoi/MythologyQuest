@@ -106,12 +106,12 @@ class World():
 
 	def decodeMapCell(self, code):
 		""" Decode a map's cell."""
-		return {'w':"water", 'f':"forest", 'p':"path", 'n':"none", 'W':"wall"}[code]
+		return {'w':"water", 'f':"forest", 'p':"path", 'n':"none", 'W':"wall", 'c':"city"}[code]
 
 	def getCellSprites(self, (screen_corner_x, screen_corner_y)):
 		""" Return all the cell.sprite attributes withing the range of the hero.
-		'hero_cell_x': hero cell position
-		'hero_cell_y': hero cell position
+		'screen_corner_x': screen corner position
+		'screen_corner_y': screen corner position
 		"""
 		lSprite = []
 		for x in xrange(screen_corner_x -1, screen_corner_x + SCREEN_DIM[0] +1):
@@ -136,5 +136,14 @@ class World():
 		border.extend( zip([xleft]*(ybot-ytop), range(ytop, ybot)) ) # left
 		border.extend( zip([xright]*(ybot-ytop), range(ytop, ybot)) ) # right
 		return border
+
+	def getSpriteAroundHero(self, (hero_x, hero_y)):
+		""" Return the list of sprite object around the hero position."""
+		lSprites = pygame.sprite.Group()
+		for x in xrange(hero_x -1, hero_x +2):
+			for y in xrange(hero_y -1, hero_y +2):
+				if x == hero_x and y == hero_y: continue
+				lSprites.add( self.cellMap[x][y].sprite )
+		return lSprites
 
 

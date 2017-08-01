@@ -55,7 +55,7 @@ if __name__=='__main__':
 	lSprites_hero.add(dObj['h1'].sprite)
 	
 	# World map
-	world = World(os.sep.join([Utils.MAP_PATH, "default.map"]))
+	world = World(os.sep.join([Utils.MAP_PATH, "three_cities.map"]))
 	
 	print "World cell dimension: {}".format((world.width, world.height))
 	
@@ -119,6 +119,11 @@ if __name__=='__main__':
 		hero_pixel_position += hero_shift
 		hero_cell_position = world.convertPixelToCell(hero_pixel_position)
 		
+		## Check for collision, and therefore re-update hero position
+		lSpriteAroundHero = world.getSpriteAroundHero(hero_cell_position)
+		print len(lSpriteAroundHero)
+		
+		# Update screen position according hero position
 		screen_corner = world.screenCornerPos(hero_cell_position)
 		screen_pixel_corner = world.screenCornerPos(hero_pixel_position, True)
 		screen_pixel_shift = hero_pixel_position%Utils.CELL_DIM

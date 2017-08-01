@@ -29,4 +29,6 @@ FPS = 60 # Frames per second
 ## Colors
 COLORS = {'forest': (33, 198, 75),
 		  'water' : (42, 182, 221),
-		  'path'  : (152, 151, 163)}
+		  'path'  : (152, 151, 163),
+		  'wall'  : (140, 140, 140),
+		  'city'  : (204, 103, 99)}
