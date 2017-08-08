@@ -68,7 +68,7 @@ class Hero_sprite(pygame.sprite.Sprite):
 	"""
 	def __init__(self, grade):
 		# Call the parent class (Sprite) constructor
-		super(Hero_sprite, self).__init__() 
+		super(Hero_sprite, self).__init__()
 		
 		# Load images of each position
 		self.filename    = "%s%s%s_%%s.png" %(IMAGE_PATH, os.sep, grade)

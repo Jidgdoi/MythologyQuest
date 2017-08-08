@@ -14,7 +14,7 @@ from itertools import chain
 
 import src.Utility.Utils as Utils
 
-from src.Cell import Cell
+from src.Cell import Cell,Cell_both
 from src.Hero import Hero
 from src.Item import Item
 from src.Monster import Monster
@@ -52,7 +52,8 @@ if __name__=='__main__':
 	for Class in [Hero, Monster, Item, Spell]:
 		dObj.update( JsonParser.readObject(jsonData, Class) )
 	
-	lSprites_hero.add(dObj['h1'].sprite)
+	sprite_hero = dObj['h1'].sprite
+	lSprites_hero.add(sprite_hero)
 	
 	# World map
 	world = World(os.sep.join([Utils.MAP_PATH, "three_cities.map"]))
@@ -60,15 +61,14 @@ if __name__=='__main__':
 	print "World cell dimension: {}".format((world.width, world.height))
 	
 	# Hero
-	hero_cell_position = world.get_initial_hero_pos()
-	hero_pixel_position = world.convertCellToPixel(hero_cell_position)
 	hero_shift = np.array([0, 0]) # Pixel movement
 	
 	# Screen
-	screen_corner = world.screenCornerPos(hero_cell_position)
+	screen_cell_corner = world.getScreenCornerPos(world.hero_cell_xy, pixel=False)
+	screen_pixel_corner = world.getScreenCornerPos(world.hero_pixel_xy, pixel=True)
 	
 	# Cell sprites
-	lSprites_cell.add( world.getCellSprites(screen_corner) )
+	lSprites_cell.add( world.getCellSprites(screen_cell_corner) )
 	
 	# Text font
 	pygame.font.init()
@@ -90,16 +90,16 @@ if __name__=='__main__':
 				## Movement
 				if event.key == pygame.K_LEFT:
 					dObj['h1'].sprite.preUpdateImg("left")
-					hero_shift += (-Utils.HERO_SPEED, 0)
+					hero_shift += (+Utils.HERO_SPEED, 0)
 				elif event.key == pygame.K_RIGHT:
 					dObj['h1'].sprite.preUpdateImg("right")
-					hero_shift += (Utils.HERO_SPEED, 0)
+					hero_shift += (-Utils.HERO_SPEED, 0)
 				elif event.key == pygame.K_UP:
 					dObj['h1'].sprite.preUpdateImg("up")
-					hero_shift += (0, -Utils.HERO_SPEED)
+					hero_shift += (0, +Utils.HERO_SPEED)
 				elif event.key == pygame.K_DOWN:
 					dObj['h1'].sprite.preUpdateImg("down")
-					hero_shift += (0, Utils.HERO_SPEED)
+					hero_shift += (0, -Utils.HERO_SPEED)
 				## Menu and Options
 				elif event.key == pygame.K_q:
 					endflag = True
@@ -107,50 +107,52 @@ if __name__=='__main__':
 			# Reset speed when key goes up
 			elif event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT:
-					hero_shift += (Utils.HERO_SPEED, 0)
-				elif event.key == pygame.K_RIGHT:
 					hero_shift += (-Utils.HERO_SPEED, 0)
+				elif event.key == pygame.K_RIGHT:
+					hero_shift += (+Utils.HERO_SPEED, 0)
 				elif event.key == pygame.K_UP:
-					hero_shift += (0, Utils.HERO_SPEED)
-				elif event.key == pygame.K_DOWN:
 					hero_shift += (0, -Utils.HERO_SPEED)
+				elif event.key == pygame.K_DOWN:
+					hero_shift += (0, +Utils.HERO_SPEED)
 		
-		## Update hero position
-		hero_pixel_position += hero_shift
-		hero_cell_position = world.convertPixelToCell(hero_pixel_position)
+		## Update hero cell and pixel positions and check for collision
+		isHeroCollide = world.updateHeroPos(sprite_hero, hero_shift)
 		
-		## Check for collision, and therefore re-update hero position
-#		lSpriteAroundHero = world.getSpriteAroundHero(hero_cell_position)
-#		print len(lSpriteAroundHero)
-		
-		# Update screen position according hero position
-		screen_corner = world.screenCornerPos(hero_cell_position)
-		screen_pixel_corner = world.screenCornerPos(hero_pixel_position, True)
-		screen_pixel_shift = hero_pixel_position%Utils.CELL_DIM
+		# Update screen position according to hero position
+		screen_pixel_corner = world.getScreenCornerPos(world.hero_pixel_xy, pixel=True)
+		screen_cell_corner = world.convertPixelToCell(screen_pixel_corner)
 		
 		if fpstime%60 == 0:
-			print "Hero pixel:", hero_pixel_position, "\tHero cell:", hero_cell_position, "\tScreen corner:", screen_corner, "\tScreen pxl shift:", screen_pixel_shift
+			print "Hero pixel:", world.hero_pixel_xy, "\tHero cell:", world.hero_cell_xy, "\tScreen pxl corner:", screen_pixel_corner, "\tScreen cell corner:", screen_cell_corner
+		
+		## ==================================
+		## Sprite section
+		## ==================================
+		
+		## Update sprites list
+		borderRemove = world.getCellBorderPos(screen_cell_corner, 2, torus=True)
+		borderAdd = world.getCellBorderPos(screen_cell_corner, 1, torus=False)
+		
+		## Remove sprites on the border +2
+		for sprite in lSprites_cell:
+			if sprite.xy in borderRemove:
+				borderRemove.remove(sprite.xy)
+				lSprites_cell.remove(sprite)
+		
+		## Update sprites list
+		lSprites_hero.update()
+		lSprites_cell.update(hero_shift if not isHeroCollide else [0,0])
+		
+		## Add missing sprites on the border +1
+		for (x,y) in borderAdd:
+			xp, yp = x%world.width, y%world.height # Cell's position in the world array
+			if not lSprites_cell.has( world.cellMap[xp][yp] ):
+				world.cellMap[xp][yp].enterTheGame( screen_pixel_corner, (x,y) )
+				lSprites_cell.add( world.cellMap[xp][yp] )
 		
 		## ==================================
 		## Draw section
 		## ==================================
-		
-		## Update sprites list
-		borderRemove = world.getCellBorder(screen_corner, 2)
-		borderAdd = world.getCellBorder(screen_corner, 0) + world.getCellBorder(screen_corner, 1)
-		
-		for sprite in lSprites_cell:
-			if sprite.xy in borderRemove:
-				lSprites_cell.remove(sprite)
-		
-		for (x,y) in borderAdd:
-			if (x < 0 or x >= world.width) or (y < 0 or y >= world.height): continue
-			if not lSprites_cell.has( world.cellMap[x][y].sprite ):
-				world.cellMap[x][y].sprite.enterTheGame( screen_pixel_corner )
-				lSprites_cell.add( world.cellMap[x][y].sprite )
-		
-		lSprites_hero.update()
-		lSprites_cell.update(hero_shift)
 		
 		## Clear screen
 		screen.fill( Utils.COLORS['water'] )
@@ -160,10 +162,12 @@ if __name__=='__main__':
 		lSprites_hero.draw(screen)
 		
 		## Draw rows and columns number
-		for i in xrange(screen_corner[1], screen_corner[1] + Utils.SCREEN_DIM[1]):
-			for j in xrange(screen_corner[0], screen_corner[0] + Utils.SCREEN_DIM[0]):
-				text = myfont.render("%d/%d" %(j,i), True, (0, 0, 0))
-				screen.blit(text, world.convertCellToPixel( (j,i) - screen_corner ))
+		for i in xrange(screen_cell_corner[1], screen_cell_corner[1] + Utils.SCREEN_DIM[1]):
+			for j in xrange(screen_cell_corner[0], screen_cell_corner[0] + Utils.SCREEN_DIM[0]):
+				text = myfont.render("%d/%d" %(j,i), True, (70, 70, 70))
+				text2 = myfont.render("(%d/%d)" %(j%world.width,i%world.height), True, (70, 70, 70))
+				screen.blit(text, world.convertCellToPixel( (j,i) - screen_cell_corner ))
+				screen.blit(text2, world.convertCellToPixel( (j,i) - screen_cell_corner ) + (0,15))
 		
 		## Go ahead and update the screen with what we've drawn.
 		pygame.display.flip()
