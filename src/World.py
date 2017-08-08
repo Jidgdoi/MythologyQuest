@@ -7,7 +7,7 @@
 import pygame
 import numpy as np
 
-from Cell import Cell, Cell_both
+from Cell import Cell
 from collections import defaultdict,deque
 import src.JsonParser as JsonParser
 
@@ -105,8 +105,7 @@ class World():
 				hero     = True if ((x,y) == self.hero_cell_xy).all() else False
 				treasure = True if (x,y) in self.lCoordTreasure else False
 				trap     = True if (x,y) in self.lCoordTrap else False
-#				self.cellMap[x][y] = Cell(surface, (x, y), self.getScreenCornerPos(self.hero_pixel_xy, True), hero, treasure, trap)
-				self.cellMap[x][y] = Cell_both(surface, (x, y), self.getScreenCornerPos(self.hero_pixel_xy, True), hero, treasure, trap)
+				self.cellMap[x][y] = Cell(surface, (x, y), self.getScreenCornerPos(self.hero_pixel_xy, True), hero, treasure, trap)
 
 	def decodeMapCell(self, code):
 		""" Decode a map's cell."""
@@ -174,6 +173,7 @@ class World():
 #				print "End of collision:", self.hero_pixel_xy[0]
 #		
 		## Move on y
+		
 		self.hero_pixel_xy[1] -= hero_shift[1]
 		# Check and see if we hit anything
 #		lBlockHit = pygame.sprite.spritecollide(lSprites_hero, lSprite, False)

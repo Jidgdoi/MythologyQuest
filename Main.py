@@ -14,7 +14,7 @@ from itertools import chain
 
 import src.Utility.Utils as Utils
 
-from src.Cell import Cell,Cell_both
+from src.Cell import Cell
 from src.Hero import Hero
 from src.Item import Item
 from src.Monster import Monster
