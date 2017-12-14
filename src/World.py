@@ -45,7 +45,7 @@ class World():
 		""" Return a tuple with cell positions.
 		'xy': Pixel position of the hero.
 		"""
-		return xy / CELL_DIM
+		return (xy / CELL_DIM).astype(int)
 
 	def convertCellToPixel(self, xy):
 		""" Return a tuple with pixel positions.
@@ -58,8 +58,8 @@ class World():
 		'xy': Position of the hero (cell or pixel).
 		'pixel': Boolean to treat pixel instead of cell postion.
 		"""
-		if pixel: return xy - SCREEN_SIZE/2
-		return xy - SCREEN_DIM/2
+		if pixel: return (xy - SCREEN_SIZE/2).astype(int)
+		return (xy - SCREEN_DIM/2).astype(int)
 
 	def loadMap(self, filename):
 		"""
@@ -87,7 +87,7 @@ class World():
 		
 		for k,v in content['Map'].items():
 			if hasattr(self, k): setattr(self, k, v)
-			else: print "\033[1;31mError\033[0m: the attribute '{}' doesn\'t exist.".format(k)
+			else: print("\033[1;31mError\033[0m: the attribute '{}' doesn\'t exist.".format(k))
 		self.hero_cell_xy = np.array(self.hero_cell_xy) # convert tuple to np.array
 		self.hero_pixel_xy = self.convertCellToPixel(self.hero_cell_xy)
 		
@@ -99,8 +99,8 @@ class World():
 		Cellulize a map, which means create the map with Cell objects.
 		Update attribute cellMap.
 		"""
-		for y in xrange(self.height):
-			for x in xrange(self.width):
+		for y in range(self.height):
+			for x in range(self.width):
 				surface = self.decodeMapCell(untreatedMap[y][x])
 				hero     = True if ((x,y) == self.hero_cell_xy).all() else False
 				treasure = True if (x,y) in self.lCoordTreasure else False
@@ -111,18 +111,18 @@ class World():
 		""" Decode a map's cell."""
 		return {'w':"water", 'f':"forest", 'p':"path", 'n':"none", 'W':"wall", 'c':"city"}[code]
 
-	def getCellSprites(self, (screen_corner_x, screen_corner_y)):
+	def getCellSprites(self, screen_corner_x, screen_corner_y):
 		""" Return all the cell's attribute 'sprite' within the screen limits.
 		'(screen_corner_x, screen_corner_y)': screen corner position in cell units
 		"""
 		lSprite = []
-		for x in xrange(screen_corner_x -1, screen_corner_x + SCREEN_DIM[0] +1):
-			for y in xrange(screen_corner_y -1, screen_corner_y + SCREEN_DIM[1] +1):
+		for x in range(screen_corner_x -1, screen_corner_x + SCREEN_DIM[0] +1):
+			for y in range(screen_corner_y -1, screen_corner_y + SCREEN_DIM[1] +1):
 				if (x < 0 or x >= self.width) or (y < 0 or y >= self.height): continue
 				lSprite.append( self.cellMap[x][y] )
 		return lSprite
 
-	def getCellBorderPos(self, (cell_x, cell_y), flank=0, torus=True):
+	def getCellBorderPos(self, cell_x, cell_y, flank=0, torus=True):
 		""" Return a list of tuples, corresponding to the position of each cells on the border of the map.
 		'(cell_x, cell_y)': screen corner position in cell units
 		"""
@@ -131,16 +131,15 @@ class World():
 		ytop = cell_y - flank
 		ybot = cell_y + SCREEN_DIM[1] -1 + flank
 		
-#		print "## Flank:", flank
-#		print "top:",  zip(range(xleft, xright), [ytop]*(xright-xleft))
-#		print "bot",   zip(range(xleft, xright), [ybot]*(xright-xleft))
-#		print "left",  zip([xleft]*(ybot-ytop), range(ytop+1, ybot))
-#		print "right", zip([xright-1]*(ybot-ytop), range(ytop+1, ybot))
-		
-		border = zip(range(xleft, xright), [ytop]*(xright-xleft)) # top
-		border.extend( zip(range(xleft, xright), [ybot]*(xright-xleft)) ) # bot
-		border.extend( zip([xleft]*(ybot-ytop), range(ytop+1, ybot)) ) # left
-		border.extend( zip([xright-1]*(ybot-ytop), range(ytop+1, ybot)) ) # right
+#		print("## Flank:", flank)
+#		print("top:",  list(zip(list(range(xleft, xright)), [ytop]*(xright-xleft)))
+#		print("bot",   list(zip(list(range(xleft, xright)), [ybot]*(xright-xleft)))
+#		print("left",  list(zip([xleft]*(ybot-ytop), list(range(ytop+1, ybot))))
+#		print("right", list(zip([xright-1]*(ybot-ytop), list(range(ytop+1, ybot)))
+		border = list(zip(list(range(xleft, xright)), [ytop]*(xright-xleft))) # top
+		border.extend( zip(list(range(xleft, xright)), [ybot]*(xright-xleft)) ) # bot
+		border.extend( zip([xleft]*(ybot-ytop), list(range(ytop+1, ybot))) ) # left
+		border.extend( zip([xright-1]*(ybot-ytop), list(range(ytop+1, ybot))) ) # right
 		
 		if torus:
 			border = [(x%self.width, y%self.height) for (x,y) in border]
@@ -149,8 +148,8 @@ class World():
 	def getSpriteAroundHero(self):
 		""" Return the list of sprite object around the hero position."""
 		lSprites = pygame.sprite.Group()
-		for x in xrange(self.hero_cell_xy[0] -1, self.hero_cell_xy[0] +2):
-			for y in xrange(self.hero_cell_xy[1] -1, self.hero_cell_xy[1] +2):
+		for x in range(self.hero_cell_xy[0] -1, self.hero_cell_xy[0] +2):
+			for y in range(self.hero_cell_xy[1] -1, self.hero_cell_xy[1] +2):
 				if ((x,y) == self.hero_cell_xy).all(): continue
 				lSprites.add( self.cellMap[x%self.width][y%self.height] )
 		return lSprites
@@ -167,10 +166,10 @@ class World():
 #		for block in lBlockHit:
 #			if not block.isWalkable:
 #				collision = True
-#				print "Block:", block.rect.x
-#				print "Collision on x:", self.hero_pixel_xy[0]
+#				print("Block:", block.rect.x)
+#				print("Collision on x:", self.hero_pixel_xy[0])
 #				self.hero_pixel_xy[0] = block.rect.left if hero_shift[0] > 0 else block.rect.right
-#				print "End of collision:", self.hero_pixel_xy[0]
+#				print("End of collision:", self.hero_pixel_xy[0])
 #		
 		## Move on y
 		
@@ -180,9 +179,9 @@ class World():
 #		for block in lBlockHit:
 #			if not block.isWalkable:
 #				collision = True
-#				print "Collision on y:", self.hero_pixel_xy[1]
+#				print("Collision on y:", self.hero_pixel_xy[1])
 #				self.hero_pixel_xy[1] = block.rect.top if hero_shift[1] > 0 else block.rect.bottom
-#				print "End of collision:", self.hero_pixel_xy[1]
+#				print("End of collision:", self.hero_pixel_xy[1])
 		
 		self.hero_cell_xy = self.convertPixelToCell( self.hero_pixel_xy )
 		

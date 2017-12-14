@@ -86,7 +86,7 @@ def buildColor(fgColor='', bgColor='', fgLight=False, bgLight=False, bold=False,
 		else:		fg = '3'
 		fg += dColors[fgColor.lower()]
 	elif fgColor != '':
-		print warning("Warning: the value '%s' isn't a valid color." %fgColor)
+		print(warning("Warning: the value '%s' isn't a valid color." %fgColor))
 	
 	# --- Set background
 	bg = ''
@@ -95,7 +95,7 @@ def buildColor(fgColor='', bgColor='', fgLight=False, bgLight=False, bold=False,
 		else:		bg = '4'
 		bg += dColors[bgColor]
 	elif bgColor != '':
-		print warning("Warning: the value '%s' isn't a valid color." %fgColor)
+		print(warning("Warning: the value '%s' isn't a valid color." %fgColor))
 	
 	# --- Merge results
 	res = struct + st

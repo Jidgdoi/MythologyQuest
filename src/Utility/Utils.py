@@ -18,12 +18,12 @@ CELL_DIM = np.array( [50, 50] )
 
 ## Screen utils
 SCREEN_SIZE = np.array( [800, 600] )
-SCREEN_DIM = np.array( SCREEN_SIZE / CELL_DIM )
+SCREEN_DIM = np.array( SCREEN_SIZE / CELL_DIM, np.int)
 
-print "Screen cell dimension: {}".format(SCREEN_DIM)
+print("Screen cell dimension: {}".format(SCREEN_DIM))
 
 ## World utils
-HERO_SPEED = CELL_DIM[0]/10
+HERO_SPEED = (CELL_DIM[0]/10).astype(int)
 FPS = 60 # Frames per second
 
 ## Colors

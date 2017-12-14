@@ -5,6 +5,7 @@
 # @date 13 Mar 2017
 
 import os,sys
+sys.path.append(os.path.abspath("src"))
 import time
 import src.JsonParser as JsonParser
 import random as rd
@@ -30,7 +31,7 @@ if __name__=='__main__':
 	## ======================================
 	fpstime = 0
 	pygame.init()
-	screen = pygame.display.set_mode( Utils.SCREEN_SIZE)
+	screen = pygame.display.set_mode( Utils.SCREEN_SIZE )
 	
 	# Used to manage how fast the screen updates
 	clock = pygame.time.Clock()
@@ -58,7 +59,7 @@ if __name__=='__main__':
 	# World map
 	world = World(os.sep.join([Utils.MAP_PATH, "three_cities.map"]))
 	
-	print "World cell dimension: {}".format((world.width, world.height))
+	print("World cell dimension: {}".format((world.width, world.height)))
 	
 	# Hero
 	hero_shift = np.array([0, 0]) # Pixel movement
@@ -68,7 +69,7 @@ if __name__=='__main__':
 	screen_pixel_corner = world.getScreenCornerPos(world.hero_pixel_xy, pixel=True)
 	
 	# Cell sprites
-	lSprites_cell.add( world.getCellSprites(screen_cell_corner) )
+	lSprites_cell.add( world.getCellSprites(*screen_cell_corner) )
 	
 	# Text font
 	pygame.font.init()
@@ -123,15 +124,15 @@ if __name__=='__main__':
 		screen_cell_corner = world.convertPixelToCell(screen_pixel_corner)
 		
 		if fpstime%60 == 0:
-			print "Hero pixel:", world.hero_pixel_xy, "\tHero cell:", world.hero_cell_xy, "\tScreen pxl corner:", screen_pixel_corner, "\tScreen cell corner:", screen_cell_corner
+			print("Hero pixel: %s\tHero cell: %s\tScreen pxl corner: %s\tScreen cell corner: %s" %(world.hero_pixel_xy, world.hero_cell_xy, screen_pixel_corner, screen_cell_corner))
 		
 		## ==================================
 		## Sprite section
 		## ==================================
 		
 		## Update sprites list
-		borderRemove = world.getCellBorderPos(screen_cell_corner, 2, torus=True)
-		borderAdd = world.getCellBorderPos(screen_cell_corner, 1, torus=False)
+		borderRemove = world.getCellBorderPos(*screen_cell_corner, 2, torus=True)
+		borderAdd = world.getCellBorderPos(*screen_cell_corner, 1, torus=False)
 		
 		## Remove sprites on the border +2
 		for sprite in lSprites_cell:
@@ -141,7 +142,7 @@ if __name__=='__main__':
 		
 		## Update sprites list
 		lSprites_hero.update()
-		lSprites_cell.update(hero_shift if not isHeroCollide else [0,0])
+		lSprites_cell.update(*hero_shift if not isHeroCollide else (0,0))
 		
 		## Add missing sprites on the border +1
 		for (x,y) in borderAdd:
@@ -162,8 +163,8 @@ if __name__=='__main__':
 		lSprites_hero.draw(screen)
 		
 		## Draw rows and columns number
-		for i in xrange(screen_cell_corner[1], screen_cell_corner[1] + Utils.SCREEN_DIM[1]):
-			for j in xrange(screen_cell_corner[0], screen_cell_corner[0] + Utils.SCREEN_DIM[0]):
+		for i in range(screen_cell_corner[1], screen_cell_corner[1] + Utils.SCREEN_DIM[1]):
+			for j in range(screen_cell_corner[0], screen_cell_corner[0] + Utils.SCREEN_DIM[0]):
 				text = myfont.render("%d/%d" %(j,i), True, (70, 70, 70))
 				text2 = myfont.render("(%d/%d)" %(j%world.width,i%world.height), True, (70, 70, 70))
 				screen.blit(text, world.convertCellToPixel( (j,i) - screen_cell_corner ))

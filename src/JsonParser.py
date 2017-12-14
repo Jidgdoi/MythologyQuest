@@ -53,7 +53,7 @@ def addObject(jsonData, Object):
 	'jsonData': dictionary formated to JSON format.
 	'Object': Object to add.
 	"""
-	if jsonData[Object.__class__.__name__].has_key( Object.id ): print >> sys.stderr, "Error: the Object ID '%s' already exist in the JSON Data." %Object.id
+	if jsonData[Object.__class__.__name__].has_key( Object.id ): print("Error: the Object ID '%s' already exist in the JSON Data." %Object.id, file=sys.stderr)
 	else: jsonData[Object.__class__.__name__][Object.id] = vars(Object)
 
 def writeJson(jsonData, oFile):
@@ -61,36 +61,4 @@ def writeJson(jsonData, oFile):
 		json.dump(jsonData, fh, indent=4)
 
 def printJson(jsonData):
-	print >> sys.stdout, json.dumps(jsonData, indent=4)
-
-# =======================
-#    ===   TEST   ===
-# =======================
-
-if __name__=='__main__':
-	if len(sys.argv) == 1:
-		print >> sys.stderr, "IOError: no input file.\nUsage: python2.7 update_trackList.json.py <input.json> [ <output.json> ]"
-		sys.exit(0)
-	else:
-		iFile = sys.argv[1]
-		oFile = sys.argv[2] if len(sys.argv) > 2 else None
-	
-	## Load JSON file
-	jsonData = loadJSON(iFile)
-	
-	## Read JSON data and create objects.
-	dObj = {}
-	for Class in [Hero, Monster, Item]:
-		print " {} ".format(Class.__name__.upper()).center(25, '-')
-		dTmp = readObject(jsonData, Class)
-		dObj.update( dTmp )
-		for i in dTmp.values():
-			print i
-	
-	addObject(jsonData, dObj['h1'])
-	addObject(jsonData, Hero(name='Rufus'))
-	
-	# Write or print Json data
-	if oFile: writeJson(jsonData, oFile)
-	else: printJson(jsonData)
-
+	print(json.dumps(jsonData, indent=4), file=sys.stderr)

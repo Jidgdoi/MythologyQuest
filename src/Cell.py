@@ -51,7 +51,7 @@ class Cell(pygame.sprite.Sprite):
 		"""
 		for k,v in kwargs.items():
 			if hasattr(self, k): setattr(self, k, v)
-			else: print "\033[1;31mError\033[0m: the attribute {} doesn\'t exist.".format(k)
+			else: print("\033[1;31mError\033[0m: the attribute {} doesn\'t exist.".format(k))
 
 	def enterTheGame(self, screen_pixel_corner_xy, xy_real):
 		""" The sprite is in range of the hero: set his position on the screen.
@@ -60,7 +60,7 @@ class Cell(pygame.sprite.Sprite):
 		"""
 		self.rect.x,self.rect.y = xy_real*CELL_DIM - screen_pixel_corner_xy
 
-	def update(self, (hero_shift_x, hero_shift_y)):
+	def update(self, hero_shift_x, hero_shift_y):
 		""" Called by the Group sprite function Update(*args), update position of the cell.
 		'(hero_shift_x, hero_shift_y)': tuple of pixel shift on x and y axis
 		"""
