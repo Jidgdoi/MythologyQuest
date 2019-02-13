@@ -80,6 +80,22 @@
             "type": "consumable",
             "stack": 1,
             "action": {"add":{"health":50}}
+        },
+        "i2": {
+            "id": "i2",
+            "name": "Dagger",
+            "description": "Small piece of sharp metal with rags as handle. Damage : physical +5.",
+            "type": "weapon",
+            "position": ["leftHand","rightHand"],
+            "action": {"deal":{"physic":["gauss", 5, 2]}}
+        },
+        "i3": {
+            "id": "i3",
+            "name": "Helmet",
+            "description": "Simple helmet, with holes for the eyes. Protection : armor +2.",
+            "type": "armor",
+            "position": "head",
+            "resistance": {"physic": 5}
         }
     },
     "Spell": {
